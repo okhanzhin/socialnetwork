@@ -17,7 +17,7 @@ public class GroupDao extends AbstractDao<Group> {
     private static final String UPDATE_GROUP_BY_GROUP_ID = "UPDATE Groups SET groupDescription = ? WHERE group_ID = ?";
     private static final String DELETE_BY_ID = "DELETE FROM Groups WHERE group_ID = ?";
 
-    private ConnectionPool pool = new ConnectionPool();
+    private ConnectionPool pool = ConnectionPool.getPool();
 
     public GroupDao() {
     }
@@ -35,7 +35,7 @@ public class GroupDao extends AbstractDao<Group> {
                     getIdStatement.setString(1, group.getGroupName());
                     try (ResultSet resultSet = getIdStatement.executeQuery()) {
                         while (resultSet.next()) {
-                            group.setGroup_ID(resultSet.getInt("group_ID"));
+                            group.setGroupID(resultSet.getInt("group_ID"));
                         }
                         return group;
                     } catch (SQLException e) {
@@ -87,7 +87,7 @@ public class GroupDao extends AbstractDao<Group> {
 
     private Group createGroupFromResultSet(ResultSet resultSet) throws SQLException {
         Group group = new Group();
-        group.setGroup_ID(resultSet.getInt("group_ID"));
+        group.setGroupID(resultSet.getInt("group_ID"));
         group.setGroupName(resultSet.getString("groupName"));
         if (resultSet.getString("groupDescription") != null) {
             group.setGroupDescription(resultSet.getString("groupDescription"));
@@ -102,7 +102,7 @@ public class GroupDao extends AbstractDao<Group> {
 
         if (connection != null) {
             try (PreparedStatement updateStatement = connection.prepareStatement(UPDATE_GROUP_BY_GROUP_ID)) {
-                updateStatement.setInt(2, group.getGroup_ID());
+                updateStatement.setInt(2, group.getGroupID());
                 updateStatement.setString(1, group.getGroupDescription());
                 updateStatement.executeUpdate();
                 connection.commit();
@@ -124,7 +124,7 @@ public class GroupDao extends AbstractDao<Group> {
         Connection connection = pool.getConnection();
         if (connection != null) {
             try (PreparedStatement deleteStatement = connection.prepareStatement(DELETE_BY_ID)) {
-                deleteStatement.setInt(1, group.getGroup_ID());
+                deleteStatement.setInt(1, group.getGroupID());
                 deleteStatement.executeUpdate();
                 connection.commit();
             } catch (SQLException e) {

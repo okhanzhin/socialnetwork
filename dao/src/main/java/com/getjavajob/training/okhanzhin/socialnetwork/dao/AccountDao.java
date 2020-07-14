@@ -27,7 +27,7 @@ public class AccountDao extends AbstractDao<Account> {
             "addInfo = ? " +
             "WHERE account_ID = ?";
 
-    private ConnectionPool pool = new ConnectionPool();
+    private ConnectionPool pool = ConnectionPool.getPool();
 
     public AccountDao() {
     }
@@ -48,7 +48,7 @@ public class AccountDao extends AbstractDao<Account> {
                     getIDStatement.setString(1, account.getEmail());
                     try (ResultSet resultSet = getIDStatement.executeQuery()) {
                         while (resultSet.next()) {
-                            account.setAccount_ID(resultSet.getInt("account_ID"));
+                            account.setAccountID(resultSet.getInt("account_ID"));
 
                         }
                         return account;
@@ -72,12 +72,12 @@ public class AccountDao extends AbstractDao<Account> {
     }
 
     @Override
-    public Account getById(int account_ID) {
+    public Account getById(int accountID) {
         Account account = null;
         Connection connection = pool.getConnection();
         if (connection != null) {
             try (PreparedStatement selectStatement = connection.prepareStatement(SELECT_BY_ACCOUNT_ID)) {
-                selectStatement.setInt(1, account_ID);
+                selectStatement.setInt(1, accountID);
                 try (ResultSet resultSet = selectStatement.executeQuery()) {
                     while (resultSet.next()) {
                         account = createAccountFromResultSet(resultSet);
@@ -99,7 +99,7 @@ public class AccountDao extends AbstractDao<Account> {
     private Account createAccountFromResultSet(ResultSet resultSet) throws SQLException {
         Account account = new Account();
 
-        account.setAccount_ID(resultSet.getInt("account_ID"));
+        account.setAccountID(resultSet.getInt("account_ID"));
         account.setSurname(resultSet.getString("surname"));
 
         if (resultSet.getString("middlename") != null) {
@@ -159,7 +159,7 @@ public class AccountDao extends AbstractDao<Account> {
         Connection connection = pool.getConnection();
         if (connection != null) {
             try (PreparedStatement prepStatement = connection.prepareStatement(UPDATE_ACCOUNT_BY_ACCOUNT_ID)) {
-                prepStatement.setInt(10, account.getAccount_ID());
+                prepStatement.setInt(10, account.getAccountID());
 
                 if (account.getMiddlename() != null) {
                     prepStatement.setString(1, account.getMiddlename());
@@ -228,7 +228,7 @@ public class AccountDao extends AbstractDao<Account> {
 
         if (connection != null) {
             try (PreparedStatement deleteStatement = connection.prepareStatement(DELETE_BY_ID)) {
-                deleteStatement.setInt(1, account.getAccount_ID());
+                deleteStatement.setInt(1, account.getAccountID());
                 deleteStatement.executeUpdate();
                 connection.commit();
             } catch (SQLException e) {
@@ -268,6 +268,6 @@ public class AccountDao extends AbstractDao<Account> {
             }
         }
 
-        return null;
+        return new ArrayList<>();
     }
 }
