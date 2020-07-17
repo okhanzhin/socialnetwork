@@ -13,4 +13,6 @@ public abstract class AbstractDao<T> {
     public abstract void delete(T t);
 
     public abstract List<T> getAll();
+
+    
 }

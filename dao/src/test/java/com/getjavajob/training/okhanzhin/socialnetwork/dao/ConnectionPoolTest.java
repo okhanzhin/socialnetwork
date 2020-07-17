@@ -25,7 +25,7 @@ public class ConnectionPoolTest {
                 e.printStackTrace();
             }
             counter.incrementAndGet();
-            pool.close(connection);
+            pool.returnConnection(connection);
             latch.countDown();
         };
 

@@ -48,7 +48,7 @@ public class RelationshipDao {
         } finally {
             try {
                 connection.rollback();
-                pool.close(connection);
+                pool.returnConnection(connection);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -81,7 +81,7 @@ public class RelationshipDao {
         } finally {
             try {
                 connection.rollback();
-                pool.close(connection);
+                pool.returnConnection(connection);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -110,7 +110,7 @@ public class RelationshipDao {
         } finally {
             try {
                 connection.rollback();
-                pool.close(connection);
+                pool.returnConnection(connection);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -139,7 +139,7 @@ public class RelationshipDao {
         } finally {
             try {
                 connection.rollback();
-                pool.close(connection);
+                pool.returnConnection(connection);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -168,7 +168,7 @@ public class RelationshipDao {
         } finally {
             try {
                 connection.rollback();
-                pool.close(connection);
+                pool.returnConnection(connection);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -197,15 +197,15 @@ public class RelationshipDao {
                         friendsList.add(accountDao.getById(accountTwoID));
                     }
                 }
-                return friendsList;
+
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DaoException("Can't create friends list from ResultSet.", e);
         } finally {
-            pool.close(connection);
+            pool.returnConnection(connection);
         }
 
-        return null;
+        return friendsList;
     }
 
     public String getRelationStringById(int accountID) {
@@ -223,18 +223,14 @@ public class RelationshipDao {
                         }
                     }
                 }
+            } catch (SQLException e) {
+                throw new DaoException("Can't get relation from ResultSet.", e);
             }
             return stringBuilder.toString();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DaoException("Can't return relation row as string by ID.", e);
         } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            pool.returnConnection(connection);
         }
-
-        return null;
     }
 }

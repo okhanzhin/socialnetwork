@@ -1,0 +1,1 @@
+web: java -jar /Volumes/Library/dev/projects/getjavajob/social-network/webapp/target/webapp-1.0-SNAPSHOT-sources.jar ${WEBAPP_RUNNER_OPTS} -Xdebug -Xrunjdwp:server=okhanzhin-network.herokuapp.com,transport=dt_socket,address=4000,suspend=n okhanzhin-network --port 36651

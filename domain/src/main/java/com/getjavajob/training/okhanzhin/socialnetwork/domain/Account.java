@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Account {
-    private int account_ID;
+    private int accountID;
     private String surname;
     private String middlename;
     private String name;
@@ -31,12 +31,12 @@ public class Account {
     public Account() {
     }
 
-    public int getAccount_ID() {
-        return account_ID;
+    public int getAccountID() {
+        return accountID;
     }
 
-    public void setAccount_ID(int id) {
-        this.account_ID = id;
+    public void setAccountID(int id) {
+        this.accountID = id;
     }
 
     public String getSurname() {
@@ -149,7 +149,7 @@ public class Account {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Account account = (Account) o;
-        return account_ID == account.account_ID &&
+        return accountID == account.accountID &&
                 surname.equals(account.surname) &&
                 name.equals(account.name) &&
                 email.equals(account.email) &&
@@ -159,14 +159,14 @@ public class Account {
 
     @Override
     public int hashCode() {
-        return Objects.hash(account_ID, surname, name, email, password, dateOfBirth);
+        return Objects.hash(accountID, surname, name, email, password, dateOfBirth);
     }
 
     @Override
     public String toString() {
         return new StringBuilder().
                 append("Account{").
-                append("id='").append(account_ID).append('\'').
+                append("id='").append(accountID).append('\'').
                 append(", surname='").append(surname).append('\'').
                 append(", name='").append(name).append('\'').
                 append(", email='").append(email).append('\'').

@@ -22,7 +22,7 @@ public class GroupDaoTest extends PrepareDaoTest {
         Group exceptedGroup = new Group("First Group");
         Group actualGroup = testGroupDao.create(exceptedGroup);
 
-        exceptedGroup.setGroup_ID(1);
+        exceptedGroup.setGroupID(1);
         assertEquals(exceptedGroup, actualGroup);
     }
 
@@ -36,7 +36,7 @@ public class GroupDaoTest extends PrepareDaoTest {
     @Test
     public void update() {
         Group testGroupForUpdate = new Group("First Group");
-        testGroupForUpdate.setGroup_ID(1);
+        testGroupForUpdate.setGroupID(1);
         testGroupForUpdate.setGroupDescription("Testing update feature");
 
         testGroupDao.update(testGroupForUpdate);

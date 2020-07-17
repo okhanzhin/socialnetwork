@@ -17,7 +17,6 @@ import java.util.Properties;
 public class PrepareDaoTest {
     private static final String CREATE_TEST_TABLES = "CreateTables.sql";
     private static final String DROP_TEST_TABLES = "DropTables.sql";
-    private static final String TRUNCATE_TABLE = "TruncateTable.sql";
     private static final String CONFIG_FILE = "configDB.properties";
 
     @BeforeClass
@@ -25,10 +24,10 @@ public class PrepareDaoTest {
         executeQuery(CREATE_TEST_TABLES);
     }
 
-//    @AfterClass
-//    public static void clearDatabase() {
-//        executeQuery(DROP_TEST_TABLES);
-//    }
+    @AfterClass
+    public static void clearDatabase() {
+        executeQuery(DROP_TEST_TABLES);
+    }
 
 
     public static void executeQuery(String dbScript) {

@@ -26,7 +26,7 @@ public class AccountDaoTest extends PrepareDaoTest {
         Account exceptedAccount = new Account("Petrov", "Petr", "petrov@gmail.com", "PetrovPas");
         Account actualAccount = testAccountDao.create(exceptedAccount);
 
-        exceptedAccount.setAccount_ID(1);
+        exceptedAccount.setAccountID(1);
         assertEquals(exceptedAccount, actualAccount);
     }
 
@@ -45,7 +45,7 @@ public class AccountDaoTest extends PrepareDaoTest {
     @Test
     public void update() {
         Account testAccountForUpdate = new Account("Petrov", "Petr", "petrov@gmail.com", "PetrovPas");
-        testAccountForUpdate.setAccount_ID(1);
+        testAccountForUpdate.setAccountID(1);
         testAccountForUpdate.setMiddlename("Petrovich");
         testAccountForUpdate.setDateOfBirth(LocalDate.of(2000, 10, 20));
         testAccountForUpdate.setHomePhone("9202022020");

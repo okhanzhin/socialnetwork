@@ -1,7 +1,7 @@
 package com.getjavajob.training.okhanzhin.socialnetwork.domain;
 
 public class Group {
-    private int group_ID;
+    private int groupID;
     private String groupName;
     private String groupDescription;
 
@@ -12,12 +12,12 @@ public class Group {
     public Group() {
     }
 
-    public int getGroup_ID() {
-        return group_ID;
+    public int getGroupID() {
+        return groupID;
     }
 
-    public void setGroup_ID(int group_ID) {
-        this.group_ID = group_ID;
+    public void setGroupID(int group_ID) {
+        this.groupID = group_ID;
     }
 
     public String getGroupName() {
@@ -40,7 +40,6 @@ public class Group {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Group group = (Group) o;
 
         return groupName.equals(group.groupName);
@@ -55,7 +54,7 @@ public class Group {
     public String toString() {
         return new StringBuilder().
                 append("Group{").
-                append("group_ID='").append(group_ID).append('\'').
+                append("groupID='").append(groupID).append('\'').
                 append(", groupName='").append(groupName).append('\'').
                 append(", groupDescription='").append(groupDescription).append('\'').
                 append('}').toString();

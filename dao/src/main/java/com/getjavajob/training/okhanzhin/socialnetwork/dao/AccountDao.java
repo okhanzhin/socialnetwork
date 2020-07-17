@@ -49,19 +49,21 @@ public class AccountDao extends AbstractDao<Account> {
                     try (ResultSet resultSet = getIDStatement.executeQuery()) {
                         while (resultSet.next()) {
                             account.setAccountID(resultSet.getInt("account_ID"));
-
                         }
                         return account;
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        throw new DaoException("Can't execute query of getting account by email statement.", e);
                     }
+                } catch (SQLException e) {
+                    throw new DaoException("Can't get statement for receiving account by email.", e);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new DaoException("Can't insert account to database.", e);
             } finally {
                 try {
                     connection.rollback();
-                    pool.close(connection);
+//                    pool.close(connection);
+                    pool.returnConnection(connection);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -75,6 +77,7 @@ public class AccountDao extends AbstractDao<Account> {
     public Account getById(int accountID) {
         Account account = null;
         Connection connection = pool.getConnection();
+
         if (connection != null) {
             try (PreparedStatement selectStatement = connection.prepareStatement(SELECT_BY_ACCOUNT_ID)) {
                 selectStatement.setInt(1, accountID);
@@ -82,18 +85,18 @@ public class AccountDao extends AbstractDao<Account> {
                     while (resultSet.next()) {
                         account = createAccountFromResultSet(resultSet);
                     }
-                    return account;
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    throw new DaoException("Can't create account from ResultSet.", e);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new DaoException("Can't return account on a given query", e);
             } finally {
-                pool.close(connection);
+//                pool.close(connection);
+                pool.returnConnection(connection);
             }
         }
 
-        return null;
+        return account;
     }
 
     private Account createAccountFromResultSet(ResultSet resultSet) throws SQLException {
@@ -157,6 +160,7 @@ public class AccountDao extends AbstractDao<Account> {
     @Override
     public void update(Account account) {
         Connection connection = pool.getConnection();
+
         if (connection != null) {
             try (PreparedStatement prepStatement = connection.prepareStatement(UPDATE_ACCOUNT_BY_ACCOUNT_ID)) {
                 prepStatement.setInt(10, account.getAccountID());
@@ -210,11 +214,12 @@ public class AccountDao extends AbstractDao<Account> {
                 prepStatement.executeUpdate();
                 connection.commit();
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new DaoException("Can't update the record with the specified ID.", e);
             } finally {
                 try {
                     connection.rollback();
-                    pool.close(connection);
+//                    pool.close(connection);
+                    pool.returnConnection(connection);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -232,11 +237,12 @@ public class AccountDao extends AbstractDao<Account> {
                 deleteStatement.executeUpdate();
                 connection.commit();
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new DaoException("Can't delete the record with the specified ID.", e);
             } finally {
                 try {
                     connection.rollback();
-                    pool.close(connection);
+//                    pool.close(connection);
+                    pool.returnConnection(connection);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -248,7 +254,7 @@ public class AccountDao extends AbstractDao<Account> {
     public List<Account> getAll() {
         List<Account> accountsList = new ArrayList<>();
         Connection connection = pool.getConnection();
-
+        System.out.println(connection);
         if (connection != null) {
             try (Statement getAllStatement = connection.createStatement()) {
                 try (ResultSet resultSet = getAllStatement.executeQuery(SELECT_ALL)) {
@@ -259,15 +265,16 @@ public class AccountDao extends AbstractDao<Account> {
                     }
                     return accountsList;
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    throw new DaoException("Can't create accounts list from ResultSet.", e);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new DaoException("Can't create statement for getting account list.", e);
             } finally {
-                pool.close(connection);
+//                pool.close(connection);
+                pool.returnConnection(connection);
             }
         }
 
-        return new ArrayList<>();
+        return accountsList;
     }
 }

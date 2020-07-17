@@ -9,25 +9,20 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class RelationshipDaoTest extends PrepareDaoTest {
-    private static final String CONNECT_ACCOUNTS = "TruncateTable.sql";
+    private static final String TRUNCATE_TABLE = "TruncateTable.sql";
 
-    private static AbstractDao<Account> accountDao = new AccountDao();
-    private static List<Account> accounts = new ArrayList<>();
+    private static AbstractDao<Account> accountDao;
     private static RelationshipDao relationDao;
 
     @BeforeClass
     public static void setUp() {
+        accountDao = new AccountDao();
         relationDao = new RelationshipDao();
     }
 
-    @Ignore
+    @After
     public void clearDataBase() {
-        PrepareDaoTest.executeQuery("TruncateTable.sql");
-        Account account1 = accountDao.getById(1);
-        Account account2 = accountDao.getById(2);
-
-        accountDao.delete(account1);
-        accountDao.delete(account2);
+        PrepareDaoTest.executeQuery(TRUNCATE_TABLE);
     }
 
     @Test
@@ -37,70 +32,114 @@ public class RelationshipDaoTest extends PrepareDaoTest {
         Account account2 = new Account("Two", "Two", "twotwo@gmail.com", "twopass");
         accountDao.create(account2);
 
-        int first_ID = accountDao.getById(1).getAccount_ID();
-        int second_ID = accountDao.getById(2).getAccount_ID();
+        int accountID1 = accountDao.getById(1).getAccountID();
+        int accountID2 = accountDao.getById(2).getAccountID();
 
-        assertTrue(relationDao.sendRequest(first_ID, second_ID));
+        assertTrue(relationDao.sendRequest(accountID1, accountID2));
 
         String excepted = "1_2_0_1";
-        assertEquals(excepted, relationDao.getRelationStringById(first_ID));
+        assertEquals(excepted, relationDao.getRelationStringById(accountID1));
     }
 
     @Test
     public void acceptRequest() {
-        Account account1 = new Account("One", "One", "onee221@gmail.com", "onepass");
+        Account account1 = new Account("One", "One", "oneToOne@gmail.com", "onepass");
         accountDao.create(account1);
-        Account account2 = new Account("Two", "Two", "twotwo@gmail.com", "twopass");
+        Account account2 = new Account("Two", "Two", "twoOnTwo@gmail.com", "twopass");
         accountDao.create(account2);
 
-        assertTrue(relationDao.sendRequest(accountDao.getById(1).getAccount_ID(), accountDao.getById(2).getAccount_ID()));
-        assertTrue(relationDao.acceptRequest(accountDao.getById(2).getAccount_ID(), accountDao.getById(1).getAccount_ID()));
+        int accountID1 = accountDao.getById(1).getAccountID();
+        int accountID2 = accountDao.getById(2).getAccountID();
+
+        assertTrue(relationDao.sendRequest(accountID1, accountID2));
+        assertTrue(relationDao.acceptRequest(accountID2, accountID1));
         String excepted = "1_2_1_2";
 
-        assertEquals(excepted, relationDao.getRelationStringById(accountDao.getById(1).getAccount_ID()));
+        assertEquals(excepted, relationDao.getRelationStringById(accountID1));
     }
 
-//    @Test
-//    @Ignore
-//    public void declineRequest() {
-//        int first_ID = accountDao.getById(1).getAccount_ID();
-//        int second_ID = accountDao.getById(2).getAccount_ID();
-//
-//        assertTrue(relationDao.declineRequest(second_ID, first_ID));
-//    }
-//
-//    @Test
-//    @Ignore
-//    public void breakRelationship() {
-//        int first_ID = accountDao.getById(1).getAccount_ID();
-//        int second_ID = accountDao.getById(2).getAccount_ID();
-//
-//        assertTrue(relationDao.breakRelationship(second_ID, first_ID));
-//    }
-//
-//    @Test
-//    @Ignore
-//    public void blockAccount() {
-//        int first_ID = accountDao.getById(1).getAccount_ID();
-//        int second_ID = accountDao.getById(2).getAccount_ID();
-//
-//        assertTrue(relationDao.blockAccount(second_ID, first_ID));
-//    }
-//
-//    @Test
-//    @Ignore
-//    public void getFriendsList() {
-//        List<Integer> idnumbers = new ArrayList<>();
-//        for (int i = 1; i <= 5; i++) {
-//            idnumbers.add(accountDao.getById(i).getAccount_ID());
-//        }
-//        System.out.println(idnumbers.toString());
-//
-//        relationDao.sendRequest(idnumbers.get(0), idnumbers.get(1));
-//        relationDao.sendRequest(idnumbers.get(0), idnumbers.get(2));
-//        relationDao.sendRequest(idnumbers.get(0), idnumbers.get(3));
-//        relationDao.acceptRequest(idnumbers.get(1), idnumbers.get(0));
-//        relationDao.acceptRequest(idnumbers.get(2), idnumbers.get(0));
-//        relationDao.acceptRequest(idnumbers.get(3), idnumbers.get(0));
-//    }
+    @Test
+    public void declineRequest() {
+        Account account1 = new Account("One", "One", "oneoneone@gmail.com", "onepass");
+        accountDao.create(account1);
+        Account account2 = new Account("Two", "Two", "twotwotwo@gmail.com", "twopass");
+        accountDao.create(account2);
+
+        int accountID1 = accountDao.getById(1).getAccountID();
+        int accountID2 = accountDao.getById(2).getAccountID();
+
+        assertTrue(relationDao.sendRequest(accountID1, accountID2));
+        assertTrue(relationDao.declineRequest(accountID2, accountID1));
+        String excepted = "1_2_2_2";
+
+        assertEquals(excepted, relationDao.getRelationStringById(accountID1));
+    }
+
+    @Test
+    public void breakRelationship() {
+        Account account1 = new Account("One", "One", "oneone@gmail.com", "onepass");
+        accountDao.create(account1);
+        Account account2 = new Account("Two", "Two", "two222@gmail.com", "twopass");
+        accountDao.create(account2);
+
+        int accountID1 = accountDao.getById(1).getAccountID();
+        int accountID2 = accountDao.getById(2).getAccountID();
+
+        assertTrue(relationDao.sendRequest(accountID1, accountID2));
+        assertTrue(relationDao.breakRelationship(accountID2, accountID1));
+        String excepted = "1_2_0_2";
+
+        assertEquals(excepted, relationDao.getRelationStringById(accountID1));
+    }
+
+    @Test
+    public void blockAccount() {
+        Account account1 = new Account("One", "One", "oneone1-1@gmail.com", "onepass");
+        accountDao.create(account1);
+        Account account2 = new Account("Two", "Two", "twoAddress@gmail.com", "twopass");
+        accountDao.create(account2);
+
+        int accountID1 = accountDao.getById(1).getAccountID();
+        int accountID2 = accountDao.getById(2).getAccountID();
+
+        assertTrue(relationDao.sendRequest(accountID1, accountID2));
+        assertTrue(relationDao.blockAccount(accountID2, accountID1));
+        String excepted = "1_2_3_2";
+
+        assertEquals(excepted, relationDao.getRelationStringById(accountID1));
+    }
+
+    @Test
+    public void getFriendsList() {
+        List<Account> exceptedList = new ArrayList<>();
+
+        Account account1 = new Account("One", "One", "oneone1-1-1@gmail.com", "onepass");
+        account1.setAccountID(1);
+        exceptedList.add(account1);
+        Account account2 = new Account("Two", "Two", "twoAddress2@gmail.com", "twopass");
+        account1.setAccountID(2);
+        exceptedList.add(account2);
+        Account account3 = new Account("Three", "Three", "threeAddress@gmail.com", "threepass");
+        account1.setAccountID(3);
+        exceptedList.add(account3);
+
+        for (Account account : exceptedList) {
+            accountDao.create(account);
+        }
+
+        exceptedList.remove(account1);
+
+        int accountID1 = accountDao.getById(1).getAccountID();
+        int accountID2 = accountDao.getById(2).getAccountID();
+        int accountID3 = accountDao.getById(3).getAccountID();
+
+        assertTrue(relationDao.sendRequest(accountID1, accountID2));
+        assertTrue(relationDao.sendRequest(accountID1, accountID3));
+        assertTrue(relationDao.acceptRequest(accountID2, accountID1));
+        assertTrue(relationDao.acceptRequest(accountID3, accountID1));
+
+        System.out.println(relationDao.getFriendsList(account1).toString());
+
+        assertEquals(exceptedList.toString(), relationDao.getFriendsList(account1).toString());
+    }
 }

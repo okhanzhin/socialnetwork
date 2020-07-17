@@ -39,17 +39,17 @@ public class GroupDao extends AbstractDao<Group> {
                         }
                         return group;
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        throw new DaoException("Can't create group from ResultSet.", e);
                     }
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    throw new DaoException("Can't create of configure getting group ID statement.", e);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new DaoException("Can't insert group to database.", e);
             } finally {
                 try {
                     connection.rollback();
-                    pool.close(connection);
+                    pool.returnConnection(connection);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -73,12 +73,12 @@ public class GroupDao extends AbstractDao<Group> {
                     }
                     return group;
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    throw new DaoException("Can't create group from ResultSet.", e);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new DaoException("Can't return group on a given query", e);
             } finally {
-                pool.close(connection);
+                pool.returnConnection(connection);
             }
         }
 
@@ -107,11 +107,11 @@ public class GroupDao extends AbstractDao<Group> {
                 updateStatement.executeUpdate();
                 connection.commit();
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new DaoException("Can't update the record with the specified ID.", e);
             } finally {
                 try {
                     connection.rollback();
-                    pool.close(connection);
+                    pool.returnConnection(connection);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -128,11 +128,11 @@ public class GroupDao extends AbstractDao<Group> {
                 deleteStatement.executeUpdate();
                 connection.commit();
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new DaoException("Can't delete the record with the specified ID.", e);
             } finally {
                 try {
                     connection.rollback();
-                    pool.close(connection);
+                    pool.returnConnection(connection);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -155,12 +155,12 @@ public class GroupDao extends AbstractDao<Group> {
                     }
                     return groupsList;
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    throw new DaoException("Can't create groups list from ResultSet.", e);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new DaoException("Can't create statement for getting groups list.", e);
             } finally {
-                pool.close(connection);
+                pool.returnConnection(connection);
             }
         }
 
