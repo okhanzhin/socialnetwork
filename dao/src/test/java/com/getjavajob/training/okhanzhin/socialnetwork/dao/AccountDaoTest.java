@@ -41,6 +41,17 @@ public class AccountDaoTest extends PrepareDaoTest {
         assertEquals("PetrovPas", returnAccount.getPassword());
     }
 
+    @Test
+    public void getByEmail() {
+        AccountDao dao = new AccountDao();
+        Account returnAccount = dao.getByEmail("petrov@gmail.com");
+
+        assertEquals("Petrov", returnAccount.getSurname());
+        assertEquals("Petr", returnAccount.getName());
+        assertEquals("petrov@gmail.com", returnAccount.getEmail());
+        assertEquals("PetrovPas", returnAccount.getPassword());
+    }
+
 
     @Test
     public void update() {
@@ -79,26 +90,5 @@ public class AccountDaoTest extends PrepareDaoTest {
         assertNotNull(testAccountDao.getById(2));
         testAccountDao.delete(accountForRemoval);
         assertNull(testAccountDao.getById(2));
-    }
-
-
-    @Test
-    public void getAll() {
-        List<Account> exceptedList = new ArrayList<>();
-
-        Account firstAccount = testAccountDao.getById(1);
-        firstAccount.setDateOfBirth(LocalDate.of(2020, 2, 20));
-        testAccountDao.update(firstAccount);
-        exceptedList.add(testAccountDao.getById(1));
-
-        Account secondAccount = new Account("Ivanov", "Ivan", "ivanov@gmail.com", "IvanovPas");
-        secondAccount.setDateOfBirth(LocalDate.of(2020, 3, 30));
-        exceptedList.add(secondAccount);
-        testAccountDao.create(secondAccount);
-        testAccountDao.update(secondAccount);
-
-        List<Account> actualList = testAccountDao.getAll();
-
-        assertEquals(exceptedList, actualList);
     }
 }

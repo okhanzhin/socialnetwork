@@ -54,17 +54,4 @@ public class GroupDaoTest extends PrepareDaoTest {
         testGroupDao.delete(groupForRemoval);
         assertNull(testGroupDao.getById(2));
     }
-
-    @Test
-    public void getAll() {
-        List<Group> exceptedList = new ArrayList<>();
-        exceptedList.add(testGroupDao.getById(1));
-        Group secondGroup = new Group("Second Group");
-        exceptedList.add(secondGroup);
-        testGroupDao.create(secondGroup);
-
-        List<Group> actualList = testGroupDao.getAll();
-
-        assertEquals(exceptedList, actualList);
-    }
 }

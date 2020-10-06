@@ -1,9 +1,15 @@
 package com.getjavajob.training.okhanzhin.socialnetwork.domain;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
 public class Group {
-    private int groupID;
+    private long groupID;
     private String groupName;
     private String groupDescription;
+    private LocalDate dateOfRegistration;
+    private byte[] picture;
 
     public Group(String groupName) {
         this.groupName = groupName;
@@ -12,11 +18,11 @@ public class Group {
     public Group() {
     }
 
-    public int getGroupID() {
+    public long getGroupID() {
         return groupID;
     }
 
-    public void setGroupID(int group_ID) {
+    public void setGroupID(long group_ID) {
         this.groupID = group_ID;
     }
 
@@ -36,6 +42,22 @@ public class Group {
         this.groupDescription = groupDescription;
     }
 
+    public LocalDate getDateOfRegistration() {
+        return dateOfRegistration;
+    }
+
+    public void setDateOfRegistration(LocalDate dateOfRegistration) {
+        this.dateOfRegistration = dateOfRegistration;
+    }
+
+    public byte[] getPicture() {
+        return picture;
+    }
+
+    public void setPicture(byte[] picture) {
+        this.picture = picture;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -52,11 +74,14 @@ public class Group {
 
     @Override
     public String toString() {
-        return new StringBuilder().
-                append("Group{").
+        StringBuilder builder = new StringBuilder();
+        builder.append("Group{").
                 append("groupID='").append(groupID).append('\'').
                 append(", groupName='").append(groupName).append('\'').
                 append(", groupDescription='").append(groupDescription).append('\'').
-                append('}').toString();
+                append(", dateOfRegistration='").append(dateOfRegistration).append('\'');
+        builder.append('}');
+
+        return builder.toString();
     }
 }

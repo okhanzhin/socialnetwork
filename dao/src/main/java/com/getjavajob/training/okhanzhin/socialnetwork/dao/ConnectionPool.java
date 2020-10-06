@@ -5,8 +5,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionPool {
     private static final String CONFIG_FILE = "configDB.properties";
@@ -14,14 +14,15 @@ public class ConnectionPool {
     private static final String URL = "database.url";
     private static final String USER = "database.user";
     private static final String PASSWORD = "database.password";
-    private static final int DEFAULT_POOL_SIZE = 5;
+    private static final int DEFAULT_POOL_SIZE = 10;
+    private final int poolSize;
     private static final int TIMEOUT = 0;
     private static ConnectionPool instance;
-    //    private static ThreadLocal<Connection> threadLocal;
+    private AtomicInteger connectionCount;
     private String url;
     private String user;
     private String password;
-    private BlockingQueue<Connection> pool;
+    private ConcurrentLinkedDeque<Connection> deque;
 
     private ConnectionPool(int poolSize) {
         try {
@@ -32,9 +33,9 @@ public class ConnectionPool {
             this.url = props.getProperty(URL);
             this.user = props.getProperty(USER);
             this.password = props.getProperty(PASSWORD);
-            // TODO: 16.07.20 ask correct don't use local var for pool size
-            pool = new LinkedBlockingQueue<>(poolSize);
-            fillPool(poolSize);
+            this.poolSize = poolSize;
+            connectionCount = new AtomicInteger(0);
+            deque = new ConcurrentLinkedDeque<Connection>();
         } catch (IOException | ClassNotFoundException e) {
             throw new DaoException("Can't create pool instance.", e);
         }
@@ -45,7 +46,6 @@ public class ConnectionPool {
             synchronized (ConnectionPool.class) {
                 if (instance == null) {
                     instance = new ConnectionPool(DEFAULT_POOL_SIZE);
-//                    threadLocal = new ThreadLocal<>();
                 }
             }
         }
@@ -57,7 +57,6 @@ public class ConnectionPool {
             synchronized (ConnectionPool.class) {
                 if (instance == null) {
                     instance = new ConnectionPool(poolSize);
-//                    threadLocal = new ThreadLocal<>();
                 }
             }
         }
@@ -67,76 +66,56 @@ public class ConnectionPool {
     private Connection createConnection(String url, String user, String password) {
         try {
             Connection connection = DriverManager.getConnection(url, user, password);
+            System.out.println("Create new Connection");
             connection.setAutoCommit(false);
             return connection;
         } catch (SQLException e) {
             throw new DaoException("Can't create new connection.", e);
         }
-
     }
-
-//    private Connection setConnection() throws Exception {
-//        try {
-//            Connection connection = pool.take();
-//            if (!connection.isValid(TIMEOUT)) {
-//                connection.close();
-//                connection = createConnection(URL, USER, PASSWORD);
-//                pool.offer(connection); // put connection back to pool
-//            }
-//            threadLocal.set(connection);
-//            return connection;
-//        } catch (InterruptedException | SQLException e) {
-//            throw new Exception();
-//        }
-//    }
 
     public synchronized Connection getConnection() {
         try {
-            while (pool.size() == 0) {
-                System.out.println("Pool size equals 0");
-                wait();
-            }
-
-            if (!pool.peek().isValid(TIMEOUT)) {
-                pool.clear();
-                fillPool(DEFAULT_POOL_SIZE);
-            }
-
-            Connection connection = pool.poll();
-
             while (true) {
-                if (connection != null) {
-                    System.out.println("Connection not null");
-                    if (!connection.isValid(TIMEOUT)) {
-                        pool.remove(connection);
-                        connection = pool.poll();
+                if (connectionCount.get() < poolSize && deque.size() == 0) {
+                    connectionCount.incrementAndGet();
+                    return createConnection(url, user, password);
+                } else {
+                    while (deque.size() > 0) {
+                        Connection connection = deque.pollLast();
+
+                        if (connection == null) throw new AssertionError();
+                        if (connection.isValid(TIMEOUT)) {
+                            System.out.println("Valid connection " + "Current pool size " + deque.size());
+                            return connection;
+                        } else {
+                            System.out.println("Invalid connection" + "Current pool size " + deque.size());
+                            connectionCount.decrementAndGet();
+                        }
                     }
-                    return connection;
+
+                    if (connectionCount.get() == poolSize) {
+                        System.out.println("Waiting for connection");
+                        wait();
+                    }
                 }
             }
-        } catch (SQLException | InterruptedException e) {
-            throw new DaoException("Can't getting connection from pool.", e);
-        }
-    }
-
-    private void fillPool(int defaultPoolSize) {
-        Connection connection;
-        for (int i = 0; i < defaultPoolSize; i++) {
-            connection = createConnection(url, user, password);
-            pool.offer(connection);
+        } catch (InterruptedException | SQLException e) {
+            throw new DaoException("Failed to get connection from pool.", e);
         }
     }
 
     public synchronized void returnConnection(Connection connection) {
         try {
-            if (pool.size() == DEFAULT_POOL_SIZE) {
+            if (deque.size() == poolSize) {
                 connection.close();
             }
-            pool.put(connection);
+            deque.addLast(connection);
+            connectionCount.decrementAndGet();
             notify();
-        } catch (InterruptedException | SQLException e) {
+        } catch (SQLException e) {
             throw new DaoException("Connection can't be returned.", e);
         }
-        System.out.println(connection + " returned. Current pool size is: " + pool.size());
+        System.out.println(connection + " returned. Current pool size is: " + deque.size());
     }
 }

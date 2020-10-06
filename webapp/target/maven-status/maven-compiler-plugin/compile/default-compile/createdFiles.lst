@@ -1,1 +1,13 @@
-com/getjavajob/training/okhanzhin/socialnetwork/webapp/AccountInfoServlet.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/filter/CharacterEncodingFilter.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/MemberProcessController.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/AccountController.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/DisplayPictureController.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/FriendsController.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/filter/AuthenticationFilter.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/GroupController.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/RegisterController.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/LogOutController.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/RequestController.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/LogInController.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/CreateGroupController.class
+com/getjavajob/training/okhanzhin/socialnetwork/webapp/UpdateAccountController.class

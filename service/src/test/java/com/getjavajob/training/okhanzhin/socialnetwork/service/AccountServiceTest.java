@@ -2,6 +2,7 @@ package com.getjavajob.training.okhanzhin.socialnetwork.service;
 
 import com.getjavajob.training.okhanzhin.socialnetwork.dao.AccountDao;
 import com.getjavajob.training.okhanzhin.socialnetwork.dao.RelationshipDao;
+import com.getjavajob.training.okhanzhin.socialnetwork.dao.RequestDao;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,10 +24,12 @@ public class AccountServiceTest {
     private AccountDao accountDao;
     @Mock
     private RelationshipDao relationDao;
+    @Mock
+    private RequestDao requestDao;
 
     public AccountServiceTest() {
         MockitoAnnotations.initMocks(this);
-        this.accountService = new AccountService(accountDao, relationDao);
+        this.accountService = new AccountService(accountDao, relationDao, requestDao);
     }
 
     @Test
@@ -59,9 +62,9 @@ public class AccountServiceTest {
         Account account2 = new Account("Two", "Two", "two222@gmail.com", "twopass");
         account2.setAccountID(2);
 
-        when(relationDao.sendRequest(account1.getAccountID(), account2.getAccountID())).thenReturn(true);
-        assertTrue(accountService.addFriend(account1, account2));
-        verify(relationDao, times(1)).sendRequest(account1.getAccountID(), account2.getAccountID());
+        when(relationDao.createRelation(account1.getAccountID(), account2.getAccountID())).thenReturn(true);
+        assertTrue(accountService.createRelation(account1.getAccountID(), account2.getAccountID()));
+        verify(relationDao, times(1)).createRelation(account1.getAccountID(), account2.getAccountID());
     }
 
     @Test
@@ -71,9 +74,9 @@ public class AccountServiceTest {
         Account account2 = new Account("Two", "Two", "two222@gmail.com", "twopass");
         account2.setAccountID(2);
 
-        when(relationDao.breakRelationship(account1.getAccountID(), account2.getAccountID())).thenReturn(true);
-        assertTrue(accountService.deleteFriend(account1, account2));
-        verify(relationDao, times(1)).breakRelationship(account1.getAccountID(), account2.getAccountID());
+        when(relationDao.breakRelation(account1.getAccountID(), account2.getAccountID())).thenReturn(true);
+        assertTrue(accountService.deleteRelation(account1.getAccountID(), account2.getAccountID()));
+        verify(relationDao, times(1)).breakRelation(account1.getAccountID(), account2.getAccountID());
     }
 
     @Test
@@ -87,7 +90,7 @@ public class AccountServiceTest {
         List<Account> exceptedList = Arrays.asList(account2, account3);
 
         when(relationDao.getFriendsList(account1)).thenReturn(exceptedList);
-        List<Account> actualList = accountService.getAccountFriendsList(account1);
+        List<Account> actualList = accountService.getAccountFriends(account1);
         verify(relationDao, times(1)).getFriendsList(account1);
         assertEquals(exceptedList, actualList);
     }

@@ -24,8 +24,21 @@ accountOne_ID INT NOT NULL,
 accountTwo_ID INT NOT NULL,
 status TINYINT(3) NOT NULL DEFAULT '0',
 actionAccount_ID INT NOT NULL,
-
 CONSTRAINT relationship_pr PRIMARY KEY (accountOne_ID, accountTwo_ID),
 FOREIGN KEY (accountOne_ID) REFERENCES Accounts(account_ID) ON DELETE CASCADE,
 FOREIGN KEY (accountTwo_ID) REFERENCES Accounts(account_ID) ON DELETE CASCADE,
 FOREIGN KEY (actionAccount_ID) REFERENCES Accounts(account_ID));
+
+CREATE TABLE account_group (
+account_ID INT NOT NULL,
+group_ID INT NOT NULL);
+
+ALTER TABLE account_group ADD FOREIGN KEY (group_ID) REFERENCES Groups (group_ID);
+ALTER TABLE account_group ADD FOREIGN KEY (account_ID) REFERENCES Accounts (account_ID);
+
+CREATE TABLE phones (
+phone_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+account_ID INT NOT NULL,
+phoneNumber VARCHAR(15) NOT NULL,
+type VARCHAR(15) NOT NULL,
+FOREIGN KEY (account_ID) REFERENCES Accounts(account_ID));

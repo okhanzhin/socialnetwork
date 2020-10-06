@@ -57,6 +57,13 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <version>2.3.0.RELEASE</version>
         </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -84,14 +91,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <webXml>/Volumes/Library/dev/projects/getjavajob/social-network/webapp/web/WEB-INF/web.xml</webXml>
-                </configuration>
             </plugin>
 
             <plugin>

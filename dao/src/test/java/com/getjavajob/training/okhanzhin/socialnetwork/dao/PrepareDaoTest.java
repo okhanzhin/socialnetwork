@@ -1,10 +1,7 @@
 package com.getjavajob.training.okhanzhin.socialnetwork.dao;
 
-import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
 import org.h2.tools.RunScript;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 
 import java.io.IOException;
@@ -12,7 +9,10 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.Properties;
+
+import static java.util.Objects.*;
 
 public class PrepareDaoTest {
     private static final String CREATE_TEST_TABLES = "CreateTables.sql";
@@ -29,7 +29,6 @@ public class PrepareDaoTest {
         executeQuery(DROP_TEST_TABLES);
     }
 
-
     public static void executeQuery(String dbScript) {
         try {
             Properties props = new Properties();
@@ -41,7 +40,7 @@ public class PrepareDaoTest {
             String password = props.getProperty("database.password");
             Connection connection = DriverManager.getConnection(url, user, password);
             connection.setAutoCommit(false);
-            InputStreamReader inputScript = new InputStreamReader(PrepareDaoTest.class.getClassLoader().getResourceAsStream(dbScript));
+            InputStreamReader inputScript = new InputStreamReader(requireNonNull(PrepareDaoTest.class.getClassLoader().getResourceAsStream(dbScript)));
             RunScript.execute(connection, inputScript);
             connection.commit();
             connection.close();

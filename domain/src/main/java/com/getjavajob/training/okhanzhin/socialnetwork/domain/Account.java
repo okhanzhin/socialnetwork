@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Account {
-    private int accountID;
+    private long accountID;
     private String surname;
     private String middlename;
     private String name;
@@ -20,6 +20,9 @@ public class Account {
     private String homeAddress;
     private String workAddress;
     private String addInfo;
+    private LocalDate dateOfRegistration;
+    private String role;
+    private byte[] picture;
 
     public Account(String surname, String name, String email, String password) {
         this.surname = surname;
@@ -31,11 +34,11 @@ public class Account {
     public Account() {
     }
 
-    public int getAccountID() {
+    public long getAccountID() {
         return accountID;
     }
 
-    public void setAccountID(int id) {
+    public void setAccountID(long id) {
         this.accountID = id;
     }
 
@@ -143,18 +146,36 @@ public class Account {
         this.addInfo = addInfo;
     }
 
+    public LocalDate getDateOfRegistration() {
+        return dateOfRegistration;
+    }
+
+    public void setDateOfRegistration(LocalDate dateOfRegistration) {
+        this.dateOfRegistration = dateOfRegistration;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public byte[] getPicture() {
+        return picture;
+    }
+
+    public void setPicture(byte[] picture) {
+        this.picture = picture;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Account account = (Account) o;
-        return accountID == account.accountID &&
-                surname.equals(account.surname) &&
-                name.equals(account.name) &&
-                email.equals(account.email) &&
-                password.equals(account.password) &&
-                dateOfBirth.equals(account.dateOfBirth);
+        return accountID == account.accountID;
     }
 
     @Override
@@ -174,6 +195,8 @@ public class Account {
                 append(", dateOfBirth='").append(dateOfBirth).append('\'').
                 append(", homeAddress='").append(homeAddress).append('\'').
                 append(", workAddress='").append(workAddress).append('\'').
+                append(", dateOfRegistration='").append(dateOfRegistration).append('\'').
+                append(", role='").append(role).append('\'').
                 append('}').toString();
     }
 }

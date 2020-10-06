@@ -13,7 +13,7 @@ public class ConnectionPoolTest {
     @Test
     public void getConnection() {
         ExecutorService service = Executors.newFixedThreadPool(20);
-        ConnectionPool pool = ConnectionPool.getPool(2);
+        ConnectionPool pool = ConnectionPool.getPool(4);
         AtomicInteger counter = new AtomicInteger();
         CountDownLatch latch = new CountDownLatch(20);
 

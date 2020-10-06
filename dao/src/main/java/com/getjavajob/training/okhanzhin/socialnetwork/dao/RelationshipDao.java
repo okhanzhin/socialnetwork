@@ -11,7 +11,7 @@ import java.util.List;
 
 public class RelationshipDao {
     private static final String SEND_REQUEST =
-            "INSERT INTO Relationship (accountOne_ID, accountTwo_ID, status, actionAccount_ID) VALUES (?, ?, ?, ?)";
+            "INSERT INTO Relationship (accountOne_ID, accountTwo_ID, status, actionAccount_ID) VALUES (?, ?, 0, ?)";
     private static final String ACCEPT_REQUEST =
             "UPDATE Relationship SET status = 1, actionAccount_ID = ? WHERE accountOne_ID = ? AND accountTwo_ID = ?";
     private static final String DECLINE_REQUEST =
@@ -26,19 +26,18 @@ public class RelationshipDao {
 
     private ConnectionPool pool = ConnectionPool.getPool();
 
-    public boolean sendRequest(int accountOneID, int accountTwoID) {
+    public boolean createRelation(long accountOneID, long accountTwoID) {
         Connection connection = pool.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(SEND_REQUEST)) {
-            statement.setInt(4, accountOneID);
-            statement.setInt(3, 0);
+            statement.setLong(3, accountOneID);
 
             if (accountOneID < accountTwoID) {
-                statement.setInt(1, accountOneID);
-                statement.setInt(2, accountTwoID);
+                statement.setLong(1, accountOneID);
+                statement.setLong(2, accountTwoID);
             } else {
-                statement.setInt(1, accountTwoID);
-                statement.setInt(2, accountOneID);
+                statement.setLong(1, accountTwoID);
+                statement.setLong(2, accountOneID);
             }
             statement.executeUpdate();
             connection.commit();
@@ -57,19 +56,19 @@ public class RelationshipDao {
         return false;
     }
 
-    public boolean acceptRequest(int acceptorID, int requesterID) {
+    public boolean acceptRelation(long acceptorID, long requesterID) {
         Connection connection = pool.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(ACCEPT_REQUEST)) {
-            statement.setInt(1, acceptorID);
+            statement.setLong(1, acceptorID);
             if (acceptorID > requesterID) {
-                statement.setInt(3, acceptorID);
-                statement.setInt(2, requesterID);
+                statement.setLong(3, acceptorID);
+                statement.setLong(2, requesterID);
                 System.out.println("UPDATE Relationship SET status = 1, action_account_ID = " + acceptorID +
                         " WHERE account_one_ID = " + requesterID + " AND account_two_ID = " + acceptorID);
             } else {
-                statement.setInt(2, acceptorID);
-                statement.setInt(3, requesterID);
+                statement.setLong(2, acceptorID);
+                statement.setLong(3, requesterID);
                 System.out.println("UPDATE Relationship SET status = 1, action_account_ID = " + acceptorID +
                         " WHERE account_one_ID = " + acceptorID + " AND account_two_ID = " + requesterID);
             }
@@ -90,17 +89,17 @@ public class RelationshipDao {
         return false;
     }
 
-    public boolean declineRequest(int declinerID, int requesterID) {
+    public boolean declineRelation(long declinerID, long requesterID) {
         Connection connection = pool.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(DECLINE_REQUEST)) {
-            statement.setInt(1, declinerID);
+            statement.setLong(1, declinerID);
             if (declinerID > requesterID) {
-                statement.setInt(3, declinerID);
-                statement.setInt(2, requesterID);
+                statement.setLong(3, declinerID);
+                statement.setLong(2, requesterID);
             } else {
-                statement.setInt(3, requesterID);
-                statement.setInt(2, declinerID);
+                statement.setLong(3, requesterID);
+                statement.setLong(2, declinerID);
             }
             statement.executeUpdate();
             connection.commit();
@@ -119,17 +118,17 @@ public class RelationshipDao {
         return false;
     }
 
-    public boolean breakRelationship(int breakerID, int friendID) {
+    public boolean breakRelation(long breakerID, long friendID) {
         Connection connection = pool.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(BREAK_RELATIONSHIP)) {
-            statement.setInt(1, breakerID);
+            statement.setLong(1, breakerID);
             if (breakerID > friendID) {
-                statement.setInt(2, friendID);
-                statement.setInt(3, breakerID);
+                statement.setLong(2, friendID);
+                statement.setLong(3, breakerID);
             } else {
-                statement.setInt(2, breakerID);
-                statement.setInt(3, friendID);
+                statement.setLong(2, breakerID);
+                statement.setLong(3, friendID);
             }
             statement.executeUpdate();
             connection.commit();
@@ -148,17 +147,17 @@ public class RelationshipDao {
         return false;
     }
 
-    public boolean blockAccount(int blockerID, int friendID) {
+    public boolean blockAccount(long blockerID, long friendID) {
         Connection connection = pool.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(BLOCK_ACCOUNT)) {
-            statement.setInt(1, blockerID);
+            statement.setLong(1, blockerID);
             if (blockerID > friendID) {
-                statement.setInt(2, friendID);
-                statement.setInt(3, blockerID);
+                statement.setLong(2, friendID);
+                statement.setLong(3, blockerID);
             } else {
-                statement.setInt(2, blockerID);
-                statement.setInt(3, friendID);
+                statement.setLong(2, blockerID);
+                statement.setLong(3, friendID);
             }
             statement.executeUpdate();
             connection.commit();
@@ -178,17 +177,17 @@ public class RelationshipDao {
     }
 
     public List<Account> getFriendsList(Account account) {
-        int accountID = account.getAccountID();
+        long accountID = account.getAccountID();
         List<Account> friendsList = new ArrayList<>();
         Connection connection = pool.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(GET_FRIENDS_ID_LIST)) {
-            statement.setInt(1, accountID);
-            statement.setInt(2, accountID);
+            statement.setLong(1, accountID);
+            statement.setLong(2, accountID);
             try (ResultSet resultSet = statement.executeQuery()) {
                 AbstractDao<Account> accountDao = new AccountDao();
                 while (resultSet.next()) {
-                    int accountOneID = resultSet.getInt(1);
+                    long accountOneID = resultSet.getLong(1);
                     if (accountOneID != accountID) {
                         friendsList.add(accountDao.getById(accountOneID));
                     }
@@ -208,12 +207,12 @@ public class RelationshipDao {
         return friendsList;
     }
 
-    public String getRelationStringById(int accountID) {
+    public String getRelationStringById(long accountID) {
         Connection connection = pool.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
             StringBuilder stringBuilder = new StringBuilder();
-            statement.setInt(1, accountID);
+            statement.setLong(1, accountID);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     for (int i = 1; i <= 4; i++) {
