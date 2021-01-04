@@ -4,43 +4,43 @@ import com.getjavajob.training.okhanzhin.socialnetwork.dao.RequestDao;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Group;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Request;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Service
 public class RequestService {
-    private static final byte REQUEST_CREATED_STATUS = 0;
     private final RequestDao requestDao;
 
+    @Autowired
     public RequestService(RequestDao requestDao) {
         this.requestDao = requestDao;
     }
 
-    public RequestService() {
-        this.requestDao = new RequestDao();
-    }
-
-    public Request createGroupRequest(Request request) {
+    @Transactional
+    public Request createRequest(Request request) {
         return requestDao.create(request);
     }
 
-    public Request createRelationRequest(Request request) {
-        return requestDao.create(request);
-    }
-
+    @Transactional
     public void acceptRequest(Request request) {
         requestDao.update(request);
     }
 
+    @Transactional
     public void deleteRequest(Request request) {
-        requestDao.delete(request);
+        requestDao.deleteById(request.getRequestID());
     }
 
     public Request getById(long requestID) {
         return requestDao.getById(requestID);
     }
 
+    @Transactional
     public void setRequestUnconfirmed(Request request) {
-        request.setRequestStatus(REQUEST_CREATED_STATUS);
+        request.setStatus(Request.Status.UNCONFIRMED);
         requestDao.update(request);
     }
 

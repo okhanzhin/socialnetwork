@@ -13,8 +13,6 @@ public class Account {
     private String email;
     private String password;
     private LocalDate dateOfBirth;
-    private String homePhone;
-    private String workPhone;
     private String skype;
     private String icq;
     private String homeAddress;
@@ -22,6 +20,7 @@ public class Account {
     private String addInfo;
     private LocalDate dateOfRegistration;
     private String role;
+    private List<Phone> phones;
     private byte[] picture;
 
     public Account(String surname, String name, String email, String password) {
@@ -29,6 +28,16 @@ public class Account {
         this.name = name;
         this.email = email;
         this.password = password;
+    }
+
+    public Account(String surname, String name, String email, String password, LocalDate dateOfRegistration) {
+        this(surname, name, email, password);
+        this.dateOfRegistration = dateOfRegistration;
+    }
+
+    public Account(long accountID, String surname, String name, String email, String password, LocalDate dateOfRegistration) {
+        this(surname, name, email, password, dateOfRegistration);
+        this.accountID = accountID;
     }
 
     public Account() {
@@ -90,22 +99,6 @@ public class Account {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public String getHomePhone() {
-        return homePhone;
-    }
-
-    public void setHomePhone(String homePhone) {
-        this.homePhone = homePhone;
-    }
-
-    public String getWorkPhone() {
-        return workPhone;
-    }
-
-    public void setWorkPhone(String workPhone) {
-        this.workPhone = workPhone;
-    }
-
     public String getSkype() {
         return skype;
     }
@@ -162,6 +155,14 @@ public class Account {
         this.role = role;
     }
 
+    public List<Phone> getPhones() {
+        return phones;
+    }
+
+    public void setPhones(List<Phone> phones) {
+        this.phones = phones;
+    }
+
     public byte[] getPicture() {
         return picture;
     }
@@ -197,6 +198,7 @@ public class Account {
                 append(", workAddress='").append(workAddress).append('\'').
                 append(", dateOfRegistration='").append(dateOfRegistration).append('\'').
                 append(", role='").append(role).append('\'').
+                append(" phones='").append(phones).append('\'').
                 append('}').toString();
     }
 }

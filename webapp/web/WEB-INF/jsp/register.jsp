@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form" %>
 <!doctype html>
 <html lang="en">
 <head>
@@ -20,20 +21,21 @@
         <div class="col-4">
             <h3>Create a new account</h3>
 
-            <form action="<%= request.getContextPath() %>/register" method="post" enctype="multipart/form-data">
+            <sf:form action="<%= request.getContextPath() %>/account/new" method="post"
+                     modelAttribute = "account" enctype="multipart/form-data">
 
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Surname</span>
                     </div>
-                    <input type="text" class="form-control" name="surname">
+                    <input type="text" class="form-control" name="surname" required>
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Name</span>
                     </div>
-                    <input type="text" class="form-control" name="name">
+                    <input type="text" class="form-control" name="name" required>
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
@@ -47,14 +49,14 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">Email</span>
                     </div>
-                    <input type="text" class="form-control" name="email">
+                    <input type="text" class="form-control" name="email" required>
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Password</span>
                     </div>
-                    <input type="text" class="form-control" name="password">
+                    <input type="text" class="form-control" name="password" required>
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
@@ -68,14 +70,16 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">Home Phone</span>
                     </div>
-                    <input type="text" class="form-control" name="homePhone">
+                    <input type="text" class="form-control" name="homePhone" pattern="(\+7[0-9]{10}|8[0-9]{10})"
+                           title="'8-Ten-Digits' or '+7-Ten-Digits'">
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Work Phone</span>
                     </div>
-                    <input type="text" class="form-control" name="workPhone">
+                    <input type="text" class="form-control" name="workPhone" pattern="(\+7[0-9]{10}|8[0-9]{10})"
+                           title="'8-Ten-Digits' or '+7-Ten-Digits'">
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
@@ -130,10 +134,10 @@
                 <button type="submit" class="btn btn-primary" name="Save" value="Save">
                     Create
                 </button>
-                <a class="btn btn-outline-warning" href="<c:url value="/logIn"/>" style="color: navy">
+                <a class="btn btn-outline-warning" href="<c:url value="/auth/login"/>" style="color: navy">
                     Cancel
                 </a>
-            </form>
+            </sf:form>
         </div>
     </div>
 </div>

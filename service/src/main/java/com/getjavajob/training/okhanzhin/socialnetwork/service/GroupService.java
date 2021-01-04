@@ -4,32 +4,35 @@ import com.getjavajob.training.okhanzhin.socialnetwork.dao.*;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Group;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Member;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Service
 public class GroupService {
-    private static final byte OWNER_STATUS = 0;
-    private static final byte MODERATOR_STATUS = 1;
-    private static final byte USER_STATUS = 2;
+    public static final int RECORDS_PER_PAGE = 8;
+
     private final GroupDao groupDao;
     private final MemberDao memberDao;
+    private final AccountDao accountDao;
 
-    public GroupService(GroupDao groupDao, MemberDao memberDao, RequestDao requestDao) {
+    @Autowired
+    public GroupService(GroupDao groupDao, MemberDao memberDao, AccountDao accountDao) {
         this.groupDao = groupDao;
         this.memberDao = memberDao;
+        this.accountDao = accountDao;
     }
 
-    public GroupService() {
-        this.groupDao = new GroupDao();
-        this.memberDao = new MemberDao();
-    }
-
+    @Transactional
     public Group createGroup(Group group) {
         return groupDao.create(group);
     }
 
+    @Transactional
     public void updateGroup(Group group) {
         Group updatableGroup = groupDao.getById(group.getGroupID());
 
@@ -54,7 +57,7 @@ public class GroupService {
                 updatableGroup.setPicture(group.getPicture());
             }
         } else if (updatableGroup.getPicture() == null) {
-            if (group.getPicture().length != 0) {
+            if (group.getPicture() != null) {
                 updatableGroup.setPicture(group.getPicture());
             } else {
                 updatableGroup.setPicture(updatableGroup.getPicture());
@@ -64,11 +67,12 @@ public class GroupService {
         groupDao.update(updatableGroup);
     }
 
-    public void deleteGroup(Group group) {
-        groupDao.delete(group);
+    @Transactional
+    public void delete(Group group) {
+        groupDao.deleteById(group.getGroupID());
     }
 
-    public Group getGroupById(long groupID) {
+    public Group getById(long groupID) {
         return groupDao.getById(groupID);
     }
 
@@ -76,12 +80,12 @@ public class GroupService {
         return groupDao.getGroupsListForAccount(account);
     }
 
+    @Transactional
     public void createGroupOwner(Account account, Group group) throws ServiceException {
-        long accountID = account.getAccountID();
-        long groupID = group.getGroupID();
-        Member owner = memberDao.getOwnerByGroupId(groupID);
+        Member owner = memberDao.getOwnerByGroupId(group.getGroupID());
+
         if (owner == null) {
-            owner = new Member(accountID, groupID, OWNER_STATUS);
+            owner = new Member(account.getAccountID(), group.getGroupID(), Member.Status.OWNER);
             memberDao.create(owner);
         } else {
             throw new ServiceException("This group already has an owner.");
@@ -89,28 +93,24 @@ public class GroupService {
     }
 
     public Member getGroupOwner(Group group) {
-        long groupID = group.getGroupID();
-        return memberDao.getOwnerByGroupId(groupID);
+        return memberDao.getOwnerByGroupId(group.getGroupID());
     }
 
+    @Transactional
     public void setGroupOwner(Account account, Group group) throws ServiceException {
-        long accountID = account.getAccountID();
-        long groupID = group.getGroupID();
-        Member member = memberDao.getOwnerByGroupId(groupID);
+        Member member = memberDao.getOwnerByGroupId(group.getGroupID());
 
-        if (member.getAccountID() != accountID) {
-            member.setAccountID(accountID);
+        if (member.getAccountID() != account.getAccountID()) {
+            member.setAccountID(account.getAccountID());
             memberDao.update(member);
         } else {
             throw new ServiceException("Current account is already the owner of the group");
         }
     }
-
+    @Transactional
     public void setGroupModerator(Account account, Group group) throws ServiceException {
-        long accountID = account.getAccountID();
-        long groupID = group.getGroupID();
-        Member member = new Member(accountID, groupID, MODERATOR_STATUS);
-        List<Member> moderators = memberDao.getListOfModerators(groupID);
+        Member member = new Member(account.getAccountID(), group.getGroupID(), Member.Status.MODERATOR);
+        List<Member> moderators = memberDao.getGroupModerators(group.getGroupID());
 
         if (!moderators.contains(member)) {
             memberDao.update(member);
@@ -119,58 +119,54 @@ public class GroupService {
         }
     }
 
+    @Transactional
     public void setGroupUser(Account account, Group group) throws ServiceException {
-        long accountID = account.getAccountID();
-        long groupID = group.getGroupID();
-        Member member = new Member(accountID, groupID, USER_STATUS);
-        List<Member> users = memberDao.getListById(groupID);
+        Member member = new Member(account.getAccountID(), group.getGroupID(), Member.Status.USER);
         memberDao.update(member);
     }
 
+    @Transactional
     public Member createGroupMember(long accountID, long groupID) throws ServiceException {
-        Member member = new Member(accountID, groupID, USER_STATUS);
-        List<Member> users = memberDao.getListById(groupID);
+        Member member = new Member(accountID, groupID, Member.Status.USER);
+        List<Member> users = memberDao.getGroupMembers(groupID);
 
         if (!users.contains(member)) {
-            memberDao.create(member);
-            return member;
-        } else {
-            throw new ServiceException("Current account is already a member of the group.");
+            return memberDao.create(member);
         }
+        return null;
     }
 
     public Member getMemberByAccountId(long accountID) {
         return memberDao.getById(accountID);
     }
 
+    @Transactional
     public void deleteMemberFromGroup(Account account, Group group) throws ServiceException {
-        long accountID = account.getAccountID();
-        long groupID = group.getGroupID();
-        Member user = new Member(accountID, groupID, USER_STATUS);
-        List<Member> users = memberDao.getListById(groupID);
+        Member user = new Member(account.getAccountID(), group.getGroupID(), Member.Status.USER);
+        List<Member> users = memberDao.getGroupMembers(group.getGroupID());
 
         if (users.contains(user)) {
             memberDao.delete(user);
-        } else {
-            throw new ServiceException("Current account isn't a member of the group.");
         }
     }
 
     public List<Member> getListOfMembers(long groupID) {
-        return memberDao.getListById(groupID);
+        return memberDao.getGroupMembers(groupID);
+
     }
 
     public List<Member> getListOfModerators(long groupID) {
-        return memberDao.getListOfModerators(groupID);
+        return memberDao.getGroupModerators(groupID);
     }
 
     public boolean isAbleToModify(long accountID, long groupID) {
         List<Member> members = getListOfMembers(groupID);
         boolean isAbleToModify = false;
+
         for (Member member : members) {
             if (member.getAccountID() == accountID &&
-                    (member.getMemberStatus() == OWNER_STATUS ||
-                            member.getMemberStatus() == MODERATOR_STATUS)) {
+                    (member.getMemberStatus() == Member.Status.OWNER ||
+                            member.getMemberStatus() == Member.Status.MODERATOR)) {
                 isAbleToModify = true;
                 break;
             }
@@ -181,12 +177,28 @@ public class GroupService {
 
     public List<Account> convertMembersToAccounts(List<Member> members) {
         List<Account> accounts = new ArrayList<>();
+
         if (!members.isEmpty()) {
-            AccountDao accountDao = new AccountDao();
             for (Member member : members) {
                 accounts.add(accountDao.getById(member.getAccountID()));
             }
         }
+
         return accounts;
+    }
+
+    public List<Group> searchForGroups(String value, int currentPage) {
+        return groupDao.searchEntities(value, currentPage);
+    }
+
+    public int getNumberOfPages(String value) {
+        int rows = groupDao.getCountOfSearchResults(value);
+        int numOfPages = rows / RECORDS_PER_PAGE;
+
+        if (numOfPages % RECORDS_PER_PAGE > 0) {
+            numOfPages++;
+        }
+
+        return numOfPages;
     }
 }

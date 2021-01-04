@@ -1,4 +1,3 @@
-com/getjavajob/training/okhanzhin/socialnetwork/dao/ConnectionPool.class
 com/getjavajob/training/okhanzhin/socialnetwork/dao/GroupDao.class
 com/getjavajob/training/okhanzhin/socialnetwork/dao/RequestDao.class
 com/getjavajob/training/okhanzhin/socialnetwork/dao/MemberDao.class
@@ -6,3 +5,4 @@ com/getjavajob/training/okhanzhin/socialnetwork/dao/AccountDao.class
 com/getjavajob/training/okhanzhin/socialnetwork/dao/DaoException.class
 com/getjavajob/training/okhanzhin/socialnetwork/dao/RelationshipDao.class
 com/getjavajob/training/okhanzhin/socialnetwork/dao/AbstractDao.class
+com/getjavajob/training/okhanzhin/socialnetwork/dao/PhoneDao.class

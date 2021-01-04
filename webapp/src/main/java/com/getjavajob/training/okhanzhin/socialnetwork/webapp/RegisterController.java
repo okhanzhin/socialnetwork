@@ -1,81 +1,84 @@
 package com.getjavajob.training.okhanzhin.socialnetwork.webapp;
 
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.Phone;
 import com.getjavajob.training.okhanzhin.socialnetwork.service.AccountService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
+import javax.servlet.http.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @MultipartConfig
+@Controller
+@RequestMapping(value = "/account")
 public class RegisterController extends HttpServlet {
-    private final AccountService accountService = new AccountService();
+    private final AccountService accountService;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher(request.getContextPath() + "/WEB-INF/jsp/register.jsp").forward(request, response);
+    @Autowired
+    public RegisterController(AccountService accountService) {
+        this.accountService = accountService;
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
+    @RequestMapping(value = "/new", method = RequestMethod.GET)
+    public String showSignUpForm(Model model) {
+        model.addAttribute("account", new Account());
+        return "register";
+    }
 
-        if (email.length() == 0 || password.length() == 0) {
-            response.sendRedirect(request.getContextPath() + "/register");
+    @RequestMapping(value = "/new", method = RequestMethod.POST)
+    public String signUp(@ModelAttribute(value = "account") Account formAccount,
+                         @RequestParam("homePhone") String homePhone,
+                         @RequestParam("workPhone") String workPhone,
+                         @RequestParam("picture") MultipartFile picture,
+                         HttpSession session) throws IOException {
+        if (formAccount.getEmail().length() == 0 || formAccount.getPassword().length() == 0) {
+            return "register";
         } else {
-            Account account = new Account(request.getParameter("surname"),
-                    request.getParameter("name"),
-                    request.getParameter("email"),
-                    request.getParameter("password"));
+            Account account = new Account(formAccount.getSurname(),
+                    formAccount.getName(),
+                    formAccount.getEmail(),
+                    formAccount.getPassword());
 
-            account.setMiddlename(request.getParameter("middlename"));
-            String stringDate = request.getParameter("dateOfBirth");
-            if (stringDate.length() != 0) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate date = LocalDate.parse(stringDate, formatter);
-                account.setDateOfBirth(date);
-            } else {
-                account.setDateOfBirth(null);
-            }
-            account.setHomePhone(request.getParameter("homePhone"));
-            account.setWorkPhone(request.getParameter("workPhone"));
-            account.setSkype(request.getParameter("skype"));
-            account.setIcq(request.getParameter("icq"));
-            account.setHomeAddress(request.getParameter("homeAddress"));
-            account.setWorkAddress(request.getParameter("workAddress"));
-            account.setAddInfo(request.getParameter("addInfo"));
-            account.setRole(request.getParameter("role"));
-            Part filePart = request.getPart("picture");
-            account.setPicture(getByteArrayFromPart(filePart));
+            account.setMiddlename(formAccount.getMiddlename());
+            account.setDateOfBirth(formAccount.getDateOfBirth());
+            account.setSkype(formAccount.getSkype());
+            account.setIcq(formAccount.getIcq());
+            account.setHomeAddress(formAccount.getHomeAddress());
+            account.setWorkAddress(formAccount.getWorkAddress());
+            account.setAddInfo(formAccount.getAddInfo());
+            account.setRole(formAccount.getRole());
+            account.setPicture(picture.getBytes());
+
+            List<Phone> phones = new ArrayList<>();
+            phones.add(new Phone(homePhone, "home"));
+            phones.add(new Phone(workPhone, "work"));
+            account.setPhones(phones);
 
             Account returnedAccount = accountService.createAccount(account);
             long id = returnedAccount.getAccountID();
             account.setAccountID(id);
+
             accountService.updateAccount(account);
 
-            request.getSession().setAttribute("id", id);
-            request.getSession().setAttribute("account", returnedAccount);
+            session.setAttribute("id", id);
+            session.setAttribute("account", returnedAccount);
 
-            response.sendRedirect(request.getContextPath() + "/account?id=" + id);
-        }
-    }
-
-    private byte[] getByteArrayFromPart(Part filePart) throws IOException {
-        try (InputStream fileContent = filePart.getInputStream();
-             ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-            int nRead;
-            byte[] data = new byte[65535];
-            while ((nRead = fileContent.read(data, 0, data.length)) != -1) {
-                buffer.write(data, 0, nRead);
-            }
-            return buffer.toByteArray();
+            return "redirect:/account/" + account.getAccountID();
         }
     }
 }

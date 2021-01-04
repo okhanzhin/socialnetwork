@@ -1,7 +1,7 @@
 /Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/LogOutController.java
 /Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/LogInController.java
-/Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/filter/CharacterEncodingFilter.java
 /Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/RequestController.java
+/Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/filter/AuthenticationInterceptor.java
 /Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/MemberProcessController.java
 /Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/DisplayPictureController.java
 /Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/AccountController.java
@@ -9,5 +9,5 @@
 /Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/GroupController.java
 /Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/CreateGroupController.java
 /Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/RegisterController.java
-/Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/filter/AuthenticationFilter.java
+/Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/SearchController.java
 /Volumes/Library/dev/projects/getjavajob/social-network/webapp/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/webapp/UpdateAccountController.java

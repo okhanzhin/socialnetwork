@@ -74,14 +74,12 @@ public class Group {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Group{").
-                append("groupID='").append(groupID).append('\'').
+        return new StringBuilder().
+                append("Group{").
+                append("id='").append(groupID).append('\'').
                 append(", groupName='").append(groupName).append('\'').
                 append(", groupDescription='").append(groupDescription).append('\'').
-                append(", dateOfRegistration='").append(dateOfRegistration).append('\'');
-        builder.append('}');
-
-        return builder.toString();
+                append(", dateOfRegistration='").append(dateOfRegistration).append('\'').
+                append('}').toString();
     }
 }

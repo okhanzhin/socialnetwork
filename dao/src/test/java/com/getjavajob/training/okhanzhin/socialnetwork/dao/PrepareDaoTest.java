@@ -1,51 +1,54 @@
 package com.getjavajob.training.okhanzhin.socialnetwork.dao;
 
-import org.h2.tools.RunScript;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Objects;
-import java.util.Properties;
 
-import static java.util.Objects.*;
+import static java.util.Objects.requireNonNull;
 
+@ContextConfiguration(locations = {"classpath:dao-context.xml", "classpath:test-context.xml"})
 public class PrepareDaoTest {
     private static final String CREATE_TEST_TABLES = "CreateTables.sql";
+    private static final String TRUNCATE_TABLE = "TruncateTable.sql";
     private static final String DROP_TEST_TABLES = "DropTables.sql";
-    private static final String CONFIG_FILE = "configDB.properties";
 
-    @BeforeClass
-    public static void initDatabase() {
+    @Autowired
+    protected JdbcTemplate jdbcTemplate;
+
+    public void executeQuery(String dbScript) {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader
+                (requireNonNull(PrepareDaoTest.class.getClassLoader().getResourceAsStream(dbScript))))) {
+            while (br.ready()) {
+                sb.append(br.readLine());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        jdbcTemplate.execute(sb.toString());
+    }
+
+    @Before
+    public void initDatabase() {
+        System.out.println("CREATING TABLES");
         executeQuery(CREATE_TEST_TABLES);
     }
 
-    @AfterClass
-    public static void clearDatabase() {
-        executeQuery(DROP_TEST_TABLES);
+    @After
+    public void postTest() {
+        System.out.println("Post Test Processing.");
+        executeQuery(TRUNCATE_TABLE);
     }
 
-    public static void executeQuery(String dbScript) {
-        try {
-            Properties props = new Properties();
-            props.load(PrepareDaoTest.class.getClassLoader().getResourceAsStream(CONFIG_FILE));
-            String driver = props.getProperty("database.driver");
-            Class.forName(driver);
-            String url = props.getProperty("database.url");
-            String user = props.getProperty("database.user");
-            String password = props.getProperty("database.password");
-            Connection connection = DriverManager.getConnection(url, user, password);
-            connection.setAutoCommit(false);
-            InputStreamReader inputScript = new InputStreamReader(requireNonNull(PrepareDaoTest.class.getClassLoader().getResourceAsStream(dbScript)));
-            RunScript.execute(connection, inputScript);
-            connection.commit();
-            connection.close();
-        } catch (IOException | ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
+    @After
+    public void clearDataBase() {
+        System.out.println("CLEAR TABLES");
+        executeQuery(DROP_TEST_TABLES);
     }
 }

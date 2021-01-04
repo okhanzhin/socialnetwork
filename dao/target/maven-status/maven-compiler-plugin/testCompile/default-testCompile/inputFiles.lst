@@ -1,5 +1,7 @@
+/Volumes/Library/dev/projects/getjavajob/social-network/dao/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/MemberDaoTest.java
 /Volumes/Library/dev/projects/getjavajob/social-network/dao/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/PrepareDaoTest.java
 /Volumes/Library/dev/projects/getjavajob/social-network/dao/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/AccountDaoTest.java
 /Volumes/Library/dev/projects/getjavajob/social-network/dao/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/GroupDaoTest.java
-/Volumes/Library/dev/projects/getjavajob/social-network/dao/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/ConnectionPoolTest.java
+/Volumes/Library/dev/projects/getjavajob/social-network/dao/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/PhoneDaoTest.java
 /Volumes/Library/dev/projects/getjavajob/social-network/dao/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/RelationshipDaoTest.java
+/Volumes/Library/dev/projects/getjavajob/social-network/dao/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/RequestDaoTest.java

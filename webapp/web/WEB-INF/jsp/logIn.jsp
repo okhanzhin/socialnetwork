@@ -19,28 +19,34 @@
 <div class="container">
     <div class="row justify-content-center align-items-center vh-100">
         <div class="col-4">
-            <form action="<c:url value="/logIn"/>" method="post">
+            <form action="${pageContext.request.contextPath}/auth/login" method="post">
                 <div class="form-group">
                     <label for="exampleInputEmail1">Email address</label>
                     <input type="email" class="form-control" id="exampleInputEmail1" name="email"
-                           value="${account.email}" aria-describedby="emailHelp">
+                           value="${sessionScope.account.email}" aria-describedby="emailHelp">
                     <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone
                         else.</small>
                 </div>
                 <div class="form-group">
                     <label for="exampleInputPassword1">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" name="password" value="${account.password}">
+                    <input type="password" class="form-control" id="exampleInputPassword1" name="password" value="${sessionScope.account.password}">
                 </div>
                 <div class="form-group form-check">
                     <input type="checkbox" class="form-check-input" id="exampleCheck1" name="rememberLogPass"
                            value="true">
                     <label class="form-check-label" for="exampleCheck1">Check me out</label>
                 </div>
+<%--                display error--%>
+                <c:if test="${requestScope.logPasError != null}">
+                    <div class="alert alert-danger">
+                        <c:out value="${requestScope.logPasError}"/>
+                    </div>
+                </c:if>
                 <button type="submit" class="btn btn-primary" name="Save" value="Save">
                     LogIn
                 </button>
                 <button type="button" class="btn btn-outline-warning">
-                    <a href="<c:url value="/register"/>" style="color:inherit">
+                    <a href="<c:url value="/account/new"/>" style="color:inherit">
                         SignUp
                     </a>
                 </button>

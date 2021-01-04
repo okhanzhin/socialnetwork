@@ -4,20 +4,32 @@ import com.getjavajob.training.okhanzhin.socialnetwork.domain.Request;
 import com.getjavajob.training.okhanzhin.socialnetwork.service.AccountService;
 import com.getjavajob.training.okhanzhin.socialnetwork.service.GroupService;
 import com.getjavajob.training.okhanzhin.socialnetwork.service.RequestService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
 
+import static com.getjavajob.training.okhanzhin.socialnetwork.domain.Request.Status.fromValue;
 import static java.lang.Byte.parseByte;
 import static java.lang.Long.parseLong;
 
 public class RequestController extends HttpServlet {
-    private final AccountService accountService = new AccountService();
-    private final GroupService groupService = new GroupService();
-    private final RequestService requestService = new RequestService();
+    private AccountService accountService;
+    private GroupService groupService;
+    private RequestService requestService;
+
+    @Override
+    public void init() throws ServletException {
+        ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+        this.accountService = Objects.requireNonNull(context).getBean(AccountService.class);
+        this.groupService = Objects.requireNonNull(context).getBean(GroupService.class);
+        this.requestService = Objects.requireNonNull(context).getBean(RequestService.class);
+    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         long creatorID = parseLong(request.getParameter("creatorId"));
@@ -34,7 +46,7 @@ public class RequestController extends HttpServlet {
         Request requestObj;
 
         if (operation.equals("create")) {
-            requestObj = new Request(creatorID, recipientID, requestType, requestStatus);
+            requestObj = new Request(creatorID, recipientID, requestType, fromValue(requestStatus));
         } else {
             requestObj = requestService.getByCreatorRecipientID(creatorID, recipientID);
         }
@@ -43,17 +55,16 @@ public class RequestController extends HttpServlet {
         switch (operation) {
             case "create":
                 System.out.println("Created " + requestObj);
+                requestService.createRequest(requestObj);
                 if (requestType.equals("user")) {
-                    requestService.createRelationRequest(requestObj);
                     accountService.createRelation(creatorID, recipientID);
                     System.out.println("Creating Relation Request...");
                 } else {
-                    requestService.createGroupRequest(requestObj);
                     System.out.println("Creating Group Request...");
                 }
                 break;
             case "accept":
-                requestObj.setRequestStatus(requestStatus);
+                requestObj.setStatus(fromValue(requestStatus));
                 requestService.acceptRequest(requestObj);
                 if (requestType.equals("user")) {
                     accountService.acceptRelation(creatorID, recipientID);

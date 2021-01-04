@@ -1,14 +1,16 @@
 package com.getjavajob.training.okhanzhin.socialnetwork.dao;
 
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class RelationshipDao {
     private static final String SEND_REQUEST =
             "INSERT INTO Relationship (accountOne_ID, accountTwo_ID, status, actionAccount_ID) VALUES (?, ?, 0, ?)";
@@ -24,12 +26,18 @@ public class RelationshipDao {
             "SELECT * FROM Relationship WHERE (accountOne_ID = ? OR accountTwo_ID = ?) AND status = 1";
     private static final String SELECT_BY_ID = "SELECT * FROM Relationship WHERE accountOne_ID = ?";
 
-    private ConnectionPool pool = ConnectionPool.getPool();
+    private final JdbcTemplate jdbcTemplate;
+    private AccountDao accountDao;
 
-    public boolean createRelation(long accountOneID, long accountTwoID) {
-        Connection connection = pool.getConnection();
+    @Autowired
+    public RelationshipDao(JdbcTemplate jdbcTemplate, AccountDao accountDao) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.accountDao = accountDao;
+    }
 
-        try (PreparedStatement statement = connection.prepareStatement(SEND_REQUEST)) {
+    public void createRelation(long accountOneID, long accountTwoID) {
+        this.jdbcTemplate.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(SEND_REQUEST);
             statement.setLong(3, accountOneID);
 
             if (accountOneID < accountTwoID) {
@@ -39,27 +47,13 @@ public class RelationshipDao {
                 statement.setLong(1, accountTwoID);
                 statement.setLong(2, accountOneID);
             }
-            statement.executeUpdate();
-            connection.commit();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                connection.rollback();
-                pool.returnConnection(connection);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return false;
+            return statement;
+        });
     }
 
-    public boolean acceptRelation(long acceptorID, long requesterID) {
-        Connection connection = pool.getConnection();
-
-        try (PreparedStatement statement = connection.prepareStatement(ACCEPT_REQUEST)) {
+    public void acceptRelation(long acceptorID, long requesterID) {
+        this.jdbcTemplate.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(ACCEPT_REQUEST);
             statement.setLong(1, acceptorID);
             if (acceptorID > requesterID) {
                 statement.setLong(3, acceptorID);
@@ -72,164 +66,104 @@ public class RelationshipDao {
                 System.out.println("UPDATE Relationship SET status = 1, action_account_ID = " + acceptorID +
                         " WHERE account_one_ID = " + acceptorID + " AND account_two_ID = " + requesterID);
             }
-            statement.executeUpdate();
-            connection.commit();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                connection.rollback();
-                pool.returnConnection(connection);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return false;
+            return statement;
+        });
     }
 
-    public boolean declineRelation(long declinerID, long requesterID) {
-        Connection connection = pool.getConnection();
-
-        try (PreparedStatement statement = connection.prepareStatement(DECLINE_REQUEST)) {
+    public void declineRelation(long declinerID, long requesterID) {
+        this.jdbcTemplate.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(DECLINE_REQUEST);
             statement.setLong(1, declinerID);
             if (declinerID > requesterID) {
                 statement.setLong(3, declinerID);
                 statement.setLong(2, requesterID);
+                System.out.println("UPDATE Relationship SET status = 1, action_account_ID = " + declinerID +
+                        " WHERE account_one_ID = " + requesterID + " AND account_two_ID = " + declinerID);
             } else {
-                statement.setLong(3, requesterID);
                 statement.setLong(2, declinerID);
+                statement.setLong(3, requesterID);
+                System.out.println("UPDATE Relationship SET status = 1, action_account_ID = " + declinerID +
+                        " WHERE account_one_ID = " + declinerID + " AND account_two_ID = " + requesterID);
             }
-            statement.executeUpdate();
-            connection.commit();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                connection.rollback();
-                pool.returnConnection(connection);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return false;
+            return statement;
+        });
     }
 
-    public boolean breakRelation(long breakerID, long friendID) {
-        Connection connection = pool.getConnection();
-
-        try (PreparedStatement statement = connection.prepareStatement(BREAK_RELATIONSHIP)) {
+    public void breakRelation(long breakerID, long friendID) {
+        this.jdbcTemplate.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(BREAK_RELATIONSHIP);
             statement.setLong(1, breakerID);
             if (breakerID > friendID) {
-                statement.setLong(2, friendID);
                 statement.setLong(3, breakerID);
+                statement.setLong(2, friendID);
+                System.out.println("UPDATE Relationship SET status = 1, action_account_ID = " + breakerID +
+                        " WHERE account_one_ID = " + friendID + " AND account_two_ID = " + breakerID);
             } else {
                 statement.setLong(2, breakerID);
                 statement.setLong(3, friendID);
+                System.out.println("UPDATE Relationship SET status = 1, action_account_ID = " + breakerID +
+                        " WHERE account_one_ID = " + breakerID + " AND account_two_ID = " + friendID);
             }
-            statement.executeUpdate();
-            connection.commit();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                connection.rollback();
-                pool.returnConnection(connection);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return false;
+            return statement;
+        });
     }
 
-    public boolean blockAccount(long blockerID, long friendID) {
-        Connection connection = pool.getConnection();
-
-        try (PreparedStatement statement = connection.prepareStatement(BLOCK_ACCOUNT)) {
+    public void blockAccount(long blockerID, long friendID) {
+        this.jdbcTemplate.update(connection -> {
+            PreparedStatement statement = connection.prepareStatement(BLOCK_ACCOUNT);
             statement.setLong(1, blockerID);
             if (blockerID > friendID) {
-                statement.setLong(2, friendID);
                 statement.setLong(3, blockerID);
+                statement.setLong(2, friendID);
+                System.out.println("UPDATE Relationship SET status = 1, action_account_ID = " + blockerID +
+                        " WHERE account_one_ID = " + friendID + " AND account_two_ID = " + blockerID);
             } else {
                 statement.setLong(2, blockerID);
                 statement.setLong(3, friendID);
+                System.out.println("UPDATE Relationship SET status = 1, action_account_ID = " + blockerID +
+                        " WHERE account_one_ID = " + blockerID + " AND account_two_ID = " + friendID);
             }
-            statement.executeUpdate();
-            connection.commit();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                connection.rollback();
-                pool.returnConnection(connection);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return false;
+            return statement;
+        });
     }
 
     public List<Account> getFriendsList(Account account) {
-        long accountID = account.getAccountID();
-        List<Account> friendsList = new ArrayList<>();
-        Connection connection = pool.getConnection();
+        return this.jdbcTemplate.query(GET_FRIENDS_ID_LIST, new Object[]{account.getAccountID(), account.getAccountID()},
+                                        getListExtractor(account));
+    }
 
-        try (PreparedStatement statement = connection.prepareStatement(GET_FRIENDS_ID_LIST)) {
-            statement.setLong(1, accountID);
-            statement.setLong(2, accountID);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                AbstractDao<Account> accountDao = new AccountDao();
-                while (resultSet.next()) {
-                    long accountOneID = resultSet.getLong(1);
-                    if (accountOneID != accountID) {
-                        friendsList.add(accountDao.getById(accountOneID));
-                    }
-                    int accountTwoID = resultSet.getInt(2);
-                    if (accountTwoID != accountID) {
-                        friendsList.add(accountDao.getById(accountTwoID));
-                    }
+    private ResultSetExtractor<List<Account>> getListExtractor(Account account) {
+        return resultSet -> {
+            List<Account> accounts = new ArrayList<>();
+
+            while (resultSet.next()) {
+                long accountOneID = resultSet.getInt("accountOne_ID");
+                System.out.println(accountOneID);
+                if (accountOneID != account.getAccountID()) {
+                    accounts.add(accountDao.getById(accountOneID));
                 }
-
+                int accountTwoID = resultSet.getInt("accountTwo_ID");
+                if (accountTwoID != account.getAccountID()) {
+                    accounts.add(accountDao.getById(accountTwoID));
+                }
             }
-        } catch (SQLException e) {
-            throw new DaoException("Can't create friends list from ResultSet.", e);
-        } finally {
-            pool.returnConnection(connection);
-        }
 
-        return friendsList;
+            return accounts;
+        };
     }
 
     public String getRelationStringById(long accountID) {
-        Connection connection = pool.getConnection();
-
-        try (PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
+        return this.jdbcTemplate.query(SELECT_BY_ID, new Object[]{accountID}, resultSet -> {
             StringBuilder stringBuilder = new StringBuilder();
-            statement.setLong(1, accountID);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    for (int i = 1; i <= 4; i++) {
-                        stringBuilder.append(resultSet.getInt(i));
-                        if (i != 4) {
-                            stringBuilder.append("_");
-                        }
+            while (resultSet.next()) {
+                for (int i = 1; i <= 4; i++) {
+                    stringBuilder.append(resultSet.getInt(i));
+                    if (i != 4) {
+                        stringBuilder.append("_");
                     }
                 }
-            } catch (SQLException e) {
-                throw new DaoException("Can't get relation from ResultSet.", e);
             }
             return stringBuilder.toString();
-        } catch (SQLException e) {
-            throw new DaoException("Can't return relation row as string by ID.", e);
-        } finally {
-            pool.returnConnection(connection);
-        }
+        });
     }
 }

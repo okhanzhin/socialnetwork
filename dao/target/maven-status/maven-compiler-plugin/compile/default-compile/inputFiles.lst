@@ -1,8 +1,8 @@
 /Volumes/Library/dev/projects/getjavajob/social-network/dao/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/AbstractDao.java
+/Volumes/Library/dev/projects/getjavajob/social-network/dao/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/PhoneDao.java
 /Volumes/Library/dev/projects/getjavajob/social-network/dao/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/RequestDao.java
 /Volumes/Library/dev/projects/getjavajob/social-network/dao/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/AccountDao.java
 /Volumes/Library/dev/projects/getjavajob/social-network/dao/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/RelationshipDao.java
-/Volumes/Library/dev/projects/getjavajob/social-network/dao/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/ConnectionPool.java
 /Volumes/Library/dev/projects/getjavajob/social-network/dao/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/GroupDao.java
 /Volumes/Library/dev/projects/getjavajob/social-network/dao/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/MemberDao.java
 /Volumes/Library/dev/projects/getjavajob/social-network/dao/src/main/java/com/getjavajob/training/okhanzhin/socialnetwork/dao/DaoException.java

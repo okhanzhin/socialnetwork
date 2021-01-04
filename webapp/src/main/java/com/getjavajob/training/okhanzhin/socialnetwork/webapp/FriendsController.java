@@ -4,6 +4,8 @@ import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Request;
 import com.getjavajob.training.okhanzhin.socialnetwork.service.AccountService;
 import com.getjavajob.training.okhanzhin.socialnetwork.service.RequestService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -12,10 +14,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 public class FriendsController extends HttpServlet {
-    private final AccountService accountService = new AccountService();
-    private final RequestService requestService = new RequestService();
+    private AccountService accountService;
+    private RequestService requestService;
+
+    @Override
+    public void init() throws ServletException {
+        ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+        this.accountService = Objects.requireNonNull(context).getBean(AccountService.class);
+        this.requestService = Objects.requireNonNull(context).getBean(RequestService.class);
+    }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();

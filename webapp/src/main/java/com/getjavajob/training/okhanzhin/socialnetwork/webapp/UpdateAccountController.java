@@ -1,7 +1,10 @@
 package com.getjavajob.training.okhanzhin.socialnetwork.webapp;
 
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.Phone;
 import com.getjavajob.training.okhanzhin.socialnetwork.service.AccountService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -14,15 +17,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Objects.requireNonNull;
 
 @MultipartConfig
 public class UpdateAccountController extends HttpServlet {
-    private final AccountService service = new AccountService();
+    private static final String EMPTY_PHONE_INPUT = "";
+    private AccountService accountService;
     private Account account;
+
+    @Override
+    public void init() throws ServletException {
+        ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+        this.accountService = requireNonNull(context).getBean(AccountService.class);
+    }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         account = (Account) request.getSession().getAttribute("account");
-        System.out.println(account.toString());
         request.setAttribute("account", account);
         request.getRequestDispatcher(request.getContextPath() + "/WEB-INF/jsp/updateAccount.jsp").forward(request, response);
     }
@@ -42,8 +55,6 @@ public class UpdateAccountController extends HttpServlet {
         } else {
             account.setDateOfBirth(null);
         }
-        account.setHomePhone(request.getParameter("homePhone"));
-        account.setWorkPhone(request.getParameter("workPhone"));
         account.setSkype(request.getParameter("skype"));
         account.setIcq(request.getParameter("icq"));
         account.setHomeAddress(request.getParameter("homeAddress"));
@@ -52,10 +63,33 @@ public class UpdateAccountController extends HttpServlet {
         account.setRole(request.getParameter("role"));
         Part filePart = request.getPart("picture");
         account.setPicture(getByteArrayFromPart(filePart));
-        service.updateAccount(account);
+        populateAccountPhones(request, id);
+
+        accountService.updateAccount(account);
         request.getSession().setAttribute("account", account);
         response.sendRedirect(request.getContextPath() + "/account?id=" + account.getAccountID());
     }
+
+    private void populateAccountPhones(HttpServletRequest request, long id) {
+        List<Phone> phones = new ArrayList<>();
+        if (request.getParameterValues("workPhone[]") != null) {
+            for (String workPhone : request.getParameterValues("workPhone[]")) {
+                if (!workPhone.equals(EMPTY_PHONE_INPUT)) {
+                    phones.add(new Phone(id, workPhone, "work"));
+                }
+            }
+        }
+        if (request.getParameterValues("homePhone[]") != null) {
+            for (String homePhone : request.getParameterValues("homePhone[]")) {
+                if (!homePhone.equals(EMPTY_PHONE_INPUT)) {
+                    phones.add(new Phone(id, homePhone, "home"));
+                }
+            }
+        }
+
+        account.setPhones(phones);
+    }
+
 
     private byte[] getByteArrayFromPart(Part filePart) throws IOException {
         try (InputStream fileContent = filePart.getInputStream();

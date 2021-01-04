@@ -7,13 +7,13 @@ public class Request {
     private long creatorID;
     private long recipientID;
     private String requestType;
-    private byte requestStatus;
+    private Status status;
 
-    public Request(long creatorID, long recipientID, String requestType, byte requestStatus) {
+    public Request(long creatorID, long recipientID, String requestType, Status status) {
         this.creatorID = creatorID;
         this.recipientID = recipientID;
         this.requestType = requestType;
-        this.requestStatus = requestStatus;
+        this.status = status;
     }
 
     public Request() {
@@ -51,12 +51,12 @@ public class Request {
         this.requestType = requestType;
     }
 
-    public byte getRequestStatus() {
-        return requestStatus;
+    public Status getStatus() {
+        return status;
     }
 
-    public void setRequestStatus(byte requestStatus) {
-        this.requestStatus = requestStatus;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class Request {
 
     @Override
     public int hashCode() {
-        return Objects.hash(creatorID, recipientID, requestStatus);
+        return Objects.hash(creatorID, recipientID, status);
     }
 
     @Override
@@ -80,7 +80,35 @@ public class Request {
                 append("creatorID='").append(creatorID).append('\'').
                 append(", recipientID='").append(recipientID).append('\'').
                 append(", requestType='").append(requestType).append('\'').
-                append(", requestStatus='").append(requestStatus).append('\'').
+                append(", requestStatus='").append(status).append('\'').
                 append('}').toString();
+    }
+
+    public enum Status {
+
+        UNCONFIRMED(0), ACCEPTED(1), DECLINED(2);
+
+        private final byte status;
+        private static Status[] statuses = new Status[Status.values().length];
+
+        static {
+            int i = 0;
+            for (Status statusValue : Status.values()) {
+                statuses[i] = statusValue;
+                i++;
+            }
+        }
+
+        Status(int status) {
+            this.status = (byte) status;
+        }
+
+        public byte getStatus() {
+            return status;
+        }
+
+        public static Status fromValue(byte value) {
+            return statuses[value];
+        }
     }
 }

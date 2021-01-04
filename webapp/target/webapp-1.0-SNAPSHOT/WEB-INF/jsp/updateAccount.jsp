@@ -1,5 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<%@include file="templates/navbar.jsp" %>
+
 <html>
 <head>
     <!-- Required meta tags -->
@@ -7,9 +10,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+              integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+            <link rel="stylesheet" type="text/css" href="<c:url value="/resources/css/styles.css"/>"/>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 
     <title>Update</title>
 </head>
@@ -19,7 +25,9 @@
         <div class="col-4">
             <h3>Update account</h3>
 
-            <form action="${pageContext.request.contextPath}/update?id=${requestScope.account.accountID}" method="post"
+            <form id="form" name="form"
+                  action="${pageContext.request.contextPath}/update?id=${requestScope.account.accountID}"
+                  method="post"
                   enctype="multipart/form-data">
 
                 <input type="hidden" name="id" value="${requestScope.account.accountID}">
@@ -28,88 +36,118 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">Surname</span>
                     </div>
-                    <input type="text" class="form-control" name="surname" value="${requestScope.account.surname}">
+                    <input type="text" id="surname" class="form-control" name="surname"
+                           value="${requestScope.account.surname}">
+                    <small class="form-text text-danger input-error"></small>
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Name</span>
                     </div>
-                    <input type="text" class="form-control" name="name" value="${requestScope.account.name}">
+                    <input type="text" id="name" class="form-control" name="name" value="${requestScope.account.name}">
+                    <small class="form-text text-danger input-error"></small>
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Middlename</span>
                     </div>
-                    <input type="text" class="form-control" name="middlename"
+                    <input type="text" id="middlename" class="form-control" name="middlename"
                            value="${requestScope.account.middlename}">
+                    <small class="form-text text-danger input-error"></small>
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Password</span>
                     </div>
-                    <input type="text" class="form-control" name="password" value="${requestScope.account.password}">
+                    <input type="text" id="password" class="form-control" name="password"
+                           value="${requestScope.account.password}">
+                    <small class="form-text text-danger input-error"></small>
                 </div>
 
-                <div class="input-group input-group-sm mb-3">
+                <div class="form-group-sm">
+                    <div class="phoneList" id="list">
+                        <c:forEach var="phone" items="${requestScope.account.phones}">
+                            <div class="input-group input-group mb-3">
+
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><c:out
+                                                value="${phone.phoneType == 'work' ? 'Work' : 'Home'}"/> Phone</span>
+                                    </div>
+                                    <input type="text" id="phone" class="form-control"
+                                           name="${phone.phoneType == 'work' ? 'workPhone[]' : 'homePhone[]'}"
+                                           value="${phone.phoneNumber}">
+                                    <button type="button" class="btn btn-danger btn-sm delete-button">Delete
+                                    </button>
+
+                            </div>
+                        </c:forEach>
+                    </div>
+
+                    <div class="d-flex mb-3">
+                        <select class="select" id="phoneType">
+                            <option value="home">Home</option>
+                            <option value="work">Work</option>
+                        </select>
+                        <input type="text" id="phoneInput" class="form-control"
+                               aria-label="Text input with dropdown button"
+                               value="">
+                        <button type="button" id="addButton" class="btn btn-primary btn-sm" name="Save">Add</button>
+                    </div>
+                </div>
+
+                <div class="input-group input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Birthday</span>
                     </div>
-                    <input class="form-control" type="date" name="dateOfBirth"
+                    <input type="date" id="dateOfBirth" class="form-control" name="dateOfBirth"
                            value="${requestScope.account.dateOfBirth}">
-                </div>
-
-                <div class="input-group input-group-sm mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Home Phone</span>
-                    </div>
-                    <input type="text" class="form-control" name="homePhone" value="${requestScope.account.homePhone}">
-                </div>
-
-                <div class="input-group input-group-sm mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Work Phone</span>
-                    </div>
-                    <input type="text" class="form-control" name="workPhone" value="${requestScope.account.workPhone}">
+                    <small class="form-text text-danger input-error"></small>
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Skype</span>
                     </div>
-                    <input type="text" class="form-control" name="skype" value="${requestScope.account.skype}">
+                    <input type="text" id="skype" class="form-control" name="skype"
+                           value="${requestScope.account.skype}">
+                    <small class="form-text text-danger input-error"></small>
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Icq</span>
                     </div>
-                    <input type="text" class="form-control" name="icq" value="${requestScope.account.icq}">
+                    <input type="text" id="icq" class="form-control" name="icq" value="${requestScope.account.icq}">
+                    <small class="form-text text-danger input-error"></small>
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Home Address</span>
                     </div>
-                    <input type="text" class="form-control" name="homeAddress"
+                    <input type="text" id="homeAddress" class="form-control" name="homeAddress"
                            value="${requestScope.account.homeAddress}">
+                    <small class="form-text text-danger input-error"></small>
                 </div>
 
                 <div class="input-group input-group-sm mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Work Address</span>
                     </div>
-                    <input type="text" class="form-control" name="workAddress"
+                    <input type="text" id="workAddress" class="form-control" name="workAddress"
                            value="${requestScope.account.workAddress}">
+                    <small class="form-text text-danger input-error"></small>
                 </div>
 
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">additional information</span>
                     </div>
-                    <input type="text" class="form-control" name="addInfo" value="${requestScope.account.addInfo}">
+                    <input type="text" id="addInfo" class="form-control" name="addInfo"
+                           value="${requestScope.account.addInfo}">
                 </div>
 
                 <br>
@@ -120,7 +158,7 @@
                 </div>
 
                 <br>
-                <button type="submit" class="btn btn-primary" name="Save" value="Save">
+                <button type="submit" id="submitButton" class="btn btn-primary" name="Save" value="Save">
                     Update
                 </button>
                 <button type="button" class="btn btn-outline-warning">
@@ -132,15 +170,9 @@
         </div>
     </div>
 </div>
+</div>
 
-<script src=">https:</input>//code.jquery.com/jquery-3.5.1.slim.min.js"
-        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
-        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
-        crossorigin="anonymous"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/resources/scripts/dynamicPhoneInput.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/resources/scripts/validateForm.js"></script>
 </body>
 </html>

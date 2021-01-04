@@ -2,37 +2,35 @@ package com.getjavajob.training.okhanzhin.socialnetwork.dao;
 
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Group;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 
 import javax.sql.rowset.serial.SerialBlob;
-import java.sql.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.sql.Blob;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import static java.util.Objects.requireNonNull;
+
+@Repository
 public class AccountDao extends AbstractDao<Account> {
-    private static final String GET_ACCOUNT_ID_REGISTRATION_DATE_BY_EMAIL = "SELECT account_ID, dateOfRegistration FROM Accounts WHERE email = ?";
     private static final String SELECT_ALL = "SELECT * FROM Accounts";
-    private static final String SELECT_BY_ACCOUNT_ID = SELECT_ALL + " WHERE account_ID = ?";
     private static final String SELECT_BY_EMAIL = SELECT_ALL + " WHERE email = ?";
-    private static final String DELETE_BY_ID = "DELETE FROM Accounts WHERE account_ID = ?";
     private static final String INSERT_BY_FULL_NAME_EMAIL_PASSWORD = "INSERT INTO Accounts " +
-            "(surname, name, email, password, dateOfRegistration) " +
-            "VALUES (?, ?, ?, ?, ?)";
+            "(surname, name, email, password, dateOfRegistration) VALUES (?, ?, ?, ?, ?)";
     private static final String UPDATE_ACCOUNT_BY_ACCOUNT_ID ="UPDATE Accounts SET surname = ?, " +
-            "name = ?, " +
-            "middlename = ?, " +
-            "password = ?, " +
-            "dateOfBirth = ?, " +
-            "homePhone = ?, " +
-            "workPhone = ?, " +
-            "skype = ?, " +
-            "icq = ?, " +
-            "homeAddress = ?, " +
-            "workAddress = ?, " +
-            "addInfo = ?, " +
-            "role = ?, " +
-            "picture = ? " +
-            "WHERE account_ID = ?";
+            "name = ?, middlename = ?, password = ?, dateOfBirth = ?, " +
+            "skype = ?, icq = ?, homeAddress = ?, workAddress = ?, addInfo = ?, " +
+            "role = ?, picture = ? WHERE account_ID = ?";
     private static final String GET_ACCOUNTS_LIST_BY_GROUP_ID = "SELECT * FROM Accounts a\n" +
             "INNER JOIN Members m ON m.account_ID = a.account_ID \n" +
             "INNER JOIN Groups g ON m.group_ID = g.group_ID \n" +
@@ -42,96 +40,81 @@ public class AccountDao extends AbstractDao<Account> {
             "INNER JOIN Groups g ON r.recipient_ID = g.group_ID \n" +
             "WHERE g.group_ID = ? AND r.requestStatus = 0";
 
-    private ConnectionPool pool = ConnectionPool.getPool();
-
-    public AccountDao() {
+    @Autowired
+    public AccountDao(JdbcTemplate jdbcTemplate) {
+        super(jdbcTemplate);
+        setTableName("Accounts");
+        setIdName("account_ID");
+        setLikeQuery("surname LIKE ? OR name LIKE ?");
     }
 
-    @Override
     public Account create(Account account) {
-        Connection connection = pool.getConnection();
+        KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        try (PreparedStatement createStatement = connection.prepareStatement(INSERT_BY_FULL_NAME_EMAIL_PASSWORD)) {
+        this.jdbcTemplate.update(connection -> {
+            PreparedStatement createStatement = connection.prepareStatement(INSERT_BY_FULL_NAME_EMAIL_PASSWORD, RETURN_GENERATED_KEYS);
             createStatement.setString(1, account.getSurname());
             createStatement.setString(2, account.getName());
             createStatement.setString(3, account.getEmail());
             createStatement.setString(4, account.getPassword());
-            Date registrationDate = Date.valueOf(LocalDate.now());
-            createStatement.setDate(5, registrationDate);
-            createStatement.executeUpdate();
-            connection.commit();
-            try (PreparedStatement getIDStatement = connection.prepareStatement(GET_ACCOUNT_ID_REGISTRATION_DATE_BY_EMAIL)) {
-                getIDStatement.setString(1, account.getEmail());
-                try (ResultSet resultSet = getIDStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        account.setAccountID(resultSet.getLong("account_ID"));
-                        account.setDateOfRegistration(resultSet.getDate("dateOfRegistration").toLocalDate());
-                    }
-                    return account;
-                } catch (SQLException e) {
-                    throw new DaoException("Can't execute query of getting account by email statement.", e);
-                }
-            } catch (SQLException e) {
-                throw new DaoException("Can't get statement for receiving account by email.", e);
+            createStatement.setDate(5, Date.valueOf(account.getDateOfRegistration()));
+            return createStatement;
+        }, keyHolder);
+        account.setAccountID(requireNonNull(keyHolder.getKey()).longValue());
+
+        return account;
+    }
+
+    public Account getByEmail(String email) {
+         return this.jdbcTemplate.query(SELECT_BY_EMAIL, new Object[]{email}, getSingleAccountExtractor());
+    }
+
+    public void update(Account account) {
+        this.jdbcTemplate.update(connection -> {
+            PreparedStatement updateStatement = connection.prepareStatement(UPDATE_ACCOUNT_BY_ACCOUNT_ID);
+            updateStatement.setLong(13, account.getAccountID());
+            updateStatement.setString(1, account.getSurname());
+            updateStatement.setString(2, account.getName());
+            updateStatement.setString(3, account.getMiddlename());
+            updateStatement.setString(4, account.getPassword());
+            if (account.getDateOfBirth() != null) {
+                updateStatement.setDate(5, Date.valueOf(account.getDateOfBirth()));
+            } else {
+                updateStatement.setNull(5, Types.DATE);
             }
-        } catch (SQLException e) {
-            throw new DaoException("Can't insert account to database.", e);
-        } finally {
-            try {
-                connection.rollback();
-                pool.returnConnection(connection);
-            } catch (SQLException e) {
-                e.printStackTrace();
+            updateStatement.setString(6, account.getSkype());
+            updateStatement.setString(7, account.getIcq());
+            updateStatement.setString(8, account.getHomeAddress());
+            updateStatement.setString(9, account.getWorkAddress());
+            updateStatement.setString(10, account.getAddInfo());
+            updateStatement.setString(11, account.getRole());
+            if (account.getPicture() != null) {
+                updateStatement.setBlob(12, new SerialBlob(account.getPicture()));
+            } else {
+                updateStatement.setNull(12, Types.BLOB);
             }
-        }
+            return updateStatement;
+        });
+    }
+
+    public List<Account> getAccountsForGroup(Group group) {
+        List<Account> accounts;
+        accounts = this.jdbcTemplate.query(GET_ACCOUNTS_LIST_BY_GROUP_ID, new Object[]{group.getGroupID()},
+                (resultSet, i) -> getById(resultSet.getLong("account_ID")));
+
+        return accounts;
+    }
+
+    public List<Account> getUnconfirmedRequestAccountsForGroup(Group group) {
+        List<Account> accounts;
+        accounts = this.jdbcTemplate.query(GET_UNACCEPTABLE_ACCOUNTS_LIST_BY_RECIPIENT_ID, new Object[]{group.getGroupID()},
+                (resultSet, i) -> getById(resultSet.getLong("account_ID")));
+
+        return accounts;
     }
 
     @Override
-    public Account getById(long accountID) {
-        Account account = null;
-        Connection connection = pool.getConnection();
-
-        try (PreparedStatement selectStatement = connection.prepareStatement(SELECT_BY_ACCOUNT_ID)) {
-            selectStatement.setLong(1, accountID);
-            try (ResultSet resultSet = selectStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    account = createAccountFromResultSet(resultSet);
-                }
-                return account;
-            } catch (SQLException e) {
-                throw new DaoException("Can't create account from ResultSet.", e);
-            }
-        } catch (SQLException e) {
-            throw new DaoException("Can't return account on a given query", e);
-        } finally {
-            pool.returnConnection(connection);
-        }
-
-    }
-
-
-    public Account getByEmail(String email) {
-        Account account = null;
-        Connection connection = pool.getConnection();
-
-        try (PreparedStatement selectStatement = connection.prepareStatement(SELECT_BY_EMAIL)) {
-            selectStatement.setString(1, email);
-            try (ResultSet resultSet = selectStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    account = createAccountFromResultSet(resultSet);
-                }
-                return account;
-            } catch (SQLException e) {
-                throw new DaoException("Can't create account from ResultSet.", e);
-            }
-        } catch (SQLException e) {
-            throw new DaoException("Can't return account on a given query.", e);
-        } finally {
-            pool.returnConnection(connection);
-        }
-    }
-
-    private Account createAccountFromResultSet(ResultSet resultSet) throws SQLException {
+    protected Account createEntityFromResultSet(ResultSet resultSet) throws SQLException {
         Account account = new Account();
         account.setAccountID(resultSet.getLong("account_ID"));
         account.setSurname(resultSet.getString("surname"));
@@ -148,16 +131,6 @@ public class AccountDao extends AbstractDao<Account> {
             account.setDateOfBirth((resultSet.getDate("dateOfBirth").toLocalDate()));
         } else {
             account.setDateOfBirth(null);
-        }
-        if (resultSet.getString("homePhone") != null) {
-            account.setHomePhone(resultSet.getString("homePhone"));
-        } else {
-            account.setHomePhone(null);
-        }
-        if (resultSet.getString("workPhone") != null) {
-            account.setWorkPhone(resultSet.getString("workPhone"));
-        } else {
-            account.setWorkPhone(null);
         }
         if (resultSet.getString("skype") != null) {
             account.setSkype(resultSet.getString("skype"));
@@ -203,113 +176,18 @@ public class AccountDao extends AbstractDao<Account> {
         return account;
     }
 
-    @Override
-    public void update(Account account) {
-        Connection connection = pool.getConnection();
-
-        try (PreparedStatement prepStatement = connection.prepareStatement(UPDATE_ACCOUNT_BY_ACCOUNT_ID)) {
-            prepStatement.setLong(15, account.getAccountID());
-            prepStatement.setString(1, account.getSurname());
-            prepStatement.setString(2, account.getName());
-            prepStatement.setString(3, account.getMiddlename());
-            prepStatement.setString(4, account.getPassword());
-            if (account.getDateOfBirth() != null) {
-                prepStatement.setDate(5, Date.valueOf(account.getDateOfBirth()));
+    private ResultSetExtractor<Account> getSingleAccountExtractor() {
+        return resultSet -> {
+            if (resultSet.next()) {
+                return createEntityFromResultSet(resultSet);
             } else {
-                prepStatement.setNull(5, Types.DATE);
+                return null;
             }
-            prepStatement.setString(6, account.getHomePhone());
-            prepStatement.setString(7, account.getWorkPhone());
-            prepStatement.setString(8, account.getSkype());
-            prepStatement.setString(9, account.getIcq());
-            prepStatement.setString(10, account.getHomeAddress());
-            prepStatement.setString(11, account.getWorkAddress());
-            prepStatement.setString(12, account.getAddInfo());
-            prepStatement.setString(13, account.getRole());
-
-            if (account.getPicture() != null) {
-                prepStatement.setBlob(14, new SerialBlob(account.getPicture()));
-            } else {
-                prepStatement.setNull(14, Types.BLOB);
-            }
-
-            prepStatement.executeUpdate();
-            connection.commit();
-        } catch (SQLException e) {
-            throw new DaoException("Can't update the row with the specified ID.", e);
-        } finally {
-            try {
-                connection.rollback();
-                pool.returnConnection(connection);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        };
     }
 
     @Override
-    public void delete(Account account) {
-        Connection connection = pool.getConnection();
-
-        try (PreparedStatement deleteStatement = connection.prepareStatement(DELETE_BY_ID)) {
-            deleteStatement.setLong(1, account.getAccountID());
-            deleteStatement.executeUpdate();
-            connection.commit();
-        } catch (SQLException e) {
-            throw new DaoException("Can't delete the record with the specified ID.", e);
-        } finally {
-            try {
-                connection.rollback();
-                pool.returnConnection(connection);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public List<Account> getAccountsForGroup(Group group) {
-        List<Account> accountsList = new ArrayList<>();
-        Connection connection = pool.getConnection();
-
-        try (PreparedStatement statement = connection.prepareStatement(GET_ACCOUNTS_LIST_BY_GROUP_ID)) {
-            statement.setLong(1, group.getGroupID());
-            try (ResultSet resultSet = statement.executeQuery()) {
-                Account account;
-                while (resultSet.next()) {
-                    account = getById(resultSet.getLong("account_ID"));
-                    accountsList.add(account);
-                }
-                return accountsList;
-            } catch (SQLException e) {
-                throw new DaoException("Can't create accounts list from ResultSet.", e);
-            }
-        } catch (SQLException e) {
-            throw new DaoException("Can't create statement for getting accounts list.", e);
-        } finally {
-            pool.returnConnection(connection);
-        }
-    }
-
-    public List<Account> getUnconfirmedRequestAccountsForGroup(Group group) {
-        List<Account> accountsList = new ArrayList<>();
-        Connection connection = pool.getConnection();
-
-        try (PreparedStatement statement = connection.prepareStatement(GET_UNACCEPTABLE_ACCOUNTS_LIST_BY_RECIPIENT_ID)) {
-            statement.setLong(1, group.getGroupID());
-            try (ResultSet resultSet = statement.executeQuery()) {
-                Account account;
-                while (resultSet.next()) {
-                    account = getById(resultSet.getLong("account_ID"));
-                    accountsList.add(account);
-                }
-                return accountsList;
-            } catch (SQLException e) {
-                throw new DaoException("Can't create accounts list from ResultSet.", e);
-            }
-        } catch (SQLException e) {
-            throw new DaoException("Can't create statement for getting accounts list.", e);
-        } finally {
-            pool.returnConnection(connection);
-        }
+    protected Object[] makeValues(String value) {
+        return new Object[]{"%" + value + "%", "%" + value + "%"};
     }
 }

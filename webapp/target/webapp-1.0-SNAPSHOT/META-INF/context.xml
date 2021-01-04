@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context allowCasualMultipartParsing = "true">
+    <Resource name="jdbc/social-network" auth="Container" type="javax.sql.DataSource"
+              maxTotal="100" maxIdle="30" maxWaitMillis="10000" defaultAutoCommit="false"
+              username="bff028874b0422" password="0b3bd3a7" driverClassName="com.mysql.cj.jdbc.Driver"
+              url="jdbc:mysql://us-cdbr-east-02.cleardb.com/heroku_fe4f945c096fabd?characterEncoding=UTF-8"/>
+</Context>

@@ -3,6 +3,8 @@ package com.getjavajob.training.okhanzhin.socialnetwork.webapp;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Group;
 import com.getjavajob.training.okhanzhin.socialnetwork.service.GroupService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -13,10 +15,17 @@ import javax.servlet.http.Part;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 @MultipartConfig
 public class CreateGroupController extends HttpServlet {
-    private final GroupService groupService = new GroupService();
+    private GroupService groupService;
+
+    @Override
+    public void init() throws ServletException {
+        ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+        this.groupService = Objects.requireNonNull(context).getBean(GroupService.class);
+    }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher(request.getContextPath() + "/WEB-INF/jsp/createGroup.jsp").forward(request, response);

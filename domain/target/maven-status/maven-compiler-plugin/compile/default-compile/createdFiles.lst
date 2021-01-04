@@ -1,5 +1,7 @@
-com/getjavajob/training/okhanzhin/socialnetwork/domain/Request.class
-com/getjavajob/training/okhanzhin/socialnetwork/domain/Member$MemberStatus.class
-com/getjavajob/training/okhanzhin/socialnetwork/domain/Member.class
+com/getjavajob/training/okhanzhin/socialnetwork/domain/Request$Status.class
 com/getjavajob/training/okhanzhin/socialnetwork/domain/Group.class
+com/getjavajob/training/okhanzhin/socialnetwork/domain/Member$Status.class
 com/getjavajob/training/okhanzhin/socialnetwork/domain/Account.class
+com/getjavajob/training/okhanzhin/socialnetwork/domain/Request.class
+com/getjavajob/training/okhanzhin/socialnetwork/domain/Member.class
+com/getjavajob/training/okhanzhin/socialnetwork/domain/Phone.class

@@ -1,5 +1,7 @@
 com/getjavajob/training/okhanzhin/socialnetwork/dao/GroupDaoTest.class
 com/getjavajob/training/okhanzhin/socialnetwork/dao/AccountDaoTest.class
-com/getjavajob/training/okhanzhin/socialnetwork/dao/ConnectionPoolTest.class
-com/getjavajob/training/okhanzhin/socialnetwork/dao/RelationshipDaoTest.class
 com/getjavajob/training/okhanzhin/socialnetwork/dao/PrepareDaoTest.class
+com/getjavajob/training/okhanzhin/socialnetwork/dao/RequestDaoTest.class
+com/getjavajob/training/okhanzhin/socialnetwork/dao/MemberDaoTest.class
+com/getjavajob/training/okhanzhin/socialnetwork/dao/PhoneDaoTest.class
+com/getjavajob/training/okhanzhin/socialnetwork/dao/RelationshipDaoTest.class

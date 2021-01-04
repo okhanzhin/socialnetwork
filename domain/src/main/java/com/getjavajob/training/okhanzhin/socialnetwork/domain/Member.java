@@ -5,9 +5,9 @@ import java.util.Objects;
 public class Member {
     private long accountID;
     private long groupID;
-    private byte memberStatus;
+    private Status memberStatus;
 
-    public Member(long accountID, long groupID, byte memberStatus) {
+    public Member(long accountID, long groupID, Status memberStatus) {
         this.accountID = accountID;
         this.groupID = groupID;
         this.memberStatus = memberStatus;
@@ -32,11 +32,11 @@ public class Member {
         this.groupID = groupID;
     }
 
-    public byte getMemberStatus() {
+    public Status getMemberStatus() {
         return memberStatus;
     }
 
-    public void setMemberStatus(byte memberStatus) {
+    public void setMemberStatus(Status memberStatus) {
         this.memberStatus = memberStatus;
     }
 
@@ -64,12 +64,31 @@ public class Member {
                 append('}').toString();
     }
 
-    //todo make as enum
-    enum MemberStatus{OWNER(0), ADMIN(1), USER(2);
-        int value;
+     public enum Status {
 
-        MemberStatus(int value) {
-            this.value = value;
+        OWNER(0), MODERATOR(1), USER(2);
+
+        private final byte status;
+        private static final Status[] STATUSES = new Status[Status.values().length];
+
+        static {
+            int i = 0;
+            for (Status statusValue : Status.values()) {
+                STATUSES[i] = statusValue;
+                i++;
+            }
+        }
+
+        Status(int status) {
+            this.status = (byte) status;
+        }
+
+        public byte getStatus() {
+            return status;
+        }
+
+        public static Status fromValue(byte value) {
+            return STATUSES[value];
         }
     }
 }
