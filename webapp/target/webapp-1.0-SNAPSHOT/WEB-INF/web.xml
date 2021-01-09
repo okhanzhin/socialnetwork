@@ -5,30 +5,30 @@
          version="4.0">
 
 <!--    <welcome-file-list>-->
-<!--        <welcome-file>index.jsp</welcome-file>-->
+<!--        <welcome-file>/login</welcome-file>-->
 <!--    </welcome-file-list>-->
 
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
 
-    <filter>
-        <filter-name>CharacterEncodingFilter</filter-name>
-        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-        <init-param>
-            <param-name>encoding</param-name>
-            <param-value>UTF-8</param-value>
-        </init-param>
-        <init-param>
-            <param-name>forceEncoding</param-name>
-            <param-value>true</param-value>
-        </init-param>
-    </filter>
+<!--    <filter>-->
+<!--        <filter-name>CharacterEncodingFilter</filter-name>-->
+<!--        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>-->
+<!--        <init-param>-->
+<!--            <param-name>encoding</param-name>-->
+<!--            <param-value>UTF-8</param-value>-->
+<!--        </init-param>-->
+<!--        <init-param>-->
+<!--            <param-name>forceEncoding</param-name>-->
+<!--            <param-value>true</param-value>-->
+<!--        </init-param>-->
+<!--    </filter>-->
 
-    <filter-mapping>
-        <filter-name>CharacterEncodingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+<!--    <filter-mapping>-->
+<!--        <filter-name>CharacterEncodingFilter</filter-name>-->
+<!--        <url-pattern>/*</url-pattern>-->
+<!--    </filter-mapping>-->
 
     <servlet>
         <servlet-name>network</servlet-name>
@@ -41,136 +41,145 @@
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
-<!--    <servlet>-->
-<!--        <servlet-name>LogInController</servlet-name>-->
-<!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.LogInController</servlet-class>-->
-<!--        <load-on-startup>1</load-on-startup>-->
-<!--    </servlet>-->
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.js</url-pattern>
+        <url-pattern>*.css</url-pattern>
+        <url-pattern>*.png</url-pattern>
+        <url-pattern>*.jpg</url-pattern>
+        <url-pattern>/img/user.png</url-pattern>
+    </servlet-mapping>
 
-<!--    <servlet>-->
-<!--        <servlet-name>RegisterController</servlet-name>-->
-<!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.RegisterController</servlet-class>-->
-<!--    </servlet>-->
+    <!--    <servlet>-->
+    <!--        <servlet-name>LogInController</servlet-name>-->
+    <!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.LogInController</servlet-class>-->
+    <!--        <load-on-startup>1</load-on-startup>-->
+    <!--    </servlet>-->
 
-<!--    <servlet>-->
-<!--        <servlet-name>AccountController</servlet-name>-->
-<!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.AccountController</servlet-class>-->
-<!--        <load-on-startup>1</load-on-startup>-->
-<!--    </servlet>-->
+    <!--    <servlet>-->
+    <!--        <servlet-name>RegisterController</servlet-name>-->
+    <!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.RegisterController</servlet-class>-->
+    <!--    </servlet>-->
 
-<!--    <servlet>-->
-<!--        <servlet-name>LogOutController</servlet-name>-->
-<!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.LogOutController</servlet-class>-->
-<!--    </servlet>-->
+    <!--    <servlet>-->
+    <!--        <servlet-name>AccountController</servlet-name>-->
+    <!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.AccountController</servlet-class>-->
+    <!--        <load-on-startup>1</load-on-startup>-->
+    <!--    </servlet>-->
 
-<!--    <servlet>-->
-<!--        <servlet-name>UpdateAccountController</servlet-name>-->
-<!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.UpdateAccountController</servlet-class>-->
-<!--    </servlet>-->
+    <!--    <servlet>-->
+    <!--        <servlet-name>LogOutController</servlet-name>-->
+    <!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.LogOutController</servlet-class>-->
+    <!--    </servlet>-->
 
-<!--    <servlet>-->
-<!--        <servlet-name>DisplayPictureController</servlet-name>-->
-<!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.DisplayPictureController</servlet-class>-->
-<!--        <load-on-startup>1</load-on-startup>-->
-<!--    </servlet>-->
+    <!--    <servlet>-->
+    <!--        <servlet-name>UpdateAccountController</servlet-name>-->
+    <!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.UpdateAccountController</servlet-class>-->
+    <!--    </servlet>-->
 
-<!--    <servlet>-->
-<!--        <servlet-name>CreateGroupController</servlet-name>-->
-<!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.CreateGroupController</servlet-class>-->
-<!--    </servlet>-->
+    <!--    <servlet>-->
+    <!--        <servlet-name>DisplayPictureController</servlet-name>-->
+    <!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.DisplayPictureController</servlet-class>-->
+    <!--        <load-on-startup>1</load-on-startup>-->
+    <!--    </servlet>-->
 
-<!--    <servlet>-->
-<!--        <servlet-name>GroupController</servlet-name>-->
-<!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.GroupController</servlet-class>-->
-<!--        <load-on-startup>1</load-on-startup>-->
-<!--    </servlet>-->
+    <!--    <servlet>-->
+    <!--        <servlet-name>CreateGroupController</servlet-name>-->
+    <!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.CreateGroupController</servlet-class>-->
+    <!--    </servlet>-->
 
-<!--    <servlet>-->
-<!--        <servlet-name>RequestController</servlet-name>-->
-<!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.RequestController</servlet-class>-->
-<!--    </servlet>-->
+    <!--    <servlet>-->
+    <!--        <servlet-name>GroupController</servlet-name>-->
+    <!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.GroupController</servlet-class>-->
+    <!--        <load-on-startup>1</load-on-startup>-->
+    <!--    </servlet>-->
 
-<!--    <servlet>-->
-<!--        <servlet-name>MemberProcessController</servlet-name>-->
-<!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.MemberProcessController</servlet-class>-->
-<!--    </servlet>-->
+    <!--    <servlet>-->
+    <!--        <servlet-name>RequestController</servlet-name>-->
+    <!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.RequestController</servlet-class>-->
+    <!--    </servlet>-->
 
-<!--    <servlet>-->
-<!--        <servlet-name>FriendsController</servlet-name>-->
-<!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.FriendsController</servlet-class>-->
-<!--    </servlet>-->
+    <!--    <servlet>-->
+    <!--        <servlet-name>MemberProcessController</servlet-name>-->
+    <!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.MemberProcessController</servlet-class>-->
+    <!--    </servlet>-->
 
-<!--    <servlet>-->
-<!--        <servlet-name>SearchController</servlet-name>-->
-<!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.SearchController</servlet-class>-->
-<!--        <load-on-startup>1</load-on-startup>-->
-<!--    </servlet>-->
+    <!--    <servlet>-->
+    <!--        <servlet-name>FriendsController</servlet-name>-->
+    <!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.FriendsController</servlet-class>-->
+    <!--    </servlet>-->
 
-<!--    <filter-mapping>-->
-<!--        <filter-name>AuthenticationFilter</filter-name>-->
-<!--        <url-pattern>/*</url-pattern>-->
-<!--    </filter-mapping>-->
+    <!--    <servlet>-->
+    <!--        <servlet-name>SearchController</servlet-name>-->
+    <!--        <servlet-class>com.getjavajob.training.okhanzhin.socialnetwork.webapp.SearchController</servlet-class>-->
+    <!--        <load-on-startup>1</load-on-startup>-->
+    <!--    </servlet>-->
 
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>LogInController</servlet-name>-->
-<!--        <url-pattern>/logIn</url-pattern>-->
-<!--    </servlet-mapping>-->
+    <!--    <filter-mapping>-->
+    <!--        <filter-name>AuthenticationFilter</filter-name>-->
+    <!--        <url-pattern>/*</url-pattern>-->
+    <!--    </filter-mapping>-->
 
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>RegisterController</servlet-name>-->
-<!--        <url-pattern>/register</url-pattern>-->
-<!--    </servlet-mapping>-->
-<!--    -->
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>AccountController</servlet-name>-->
-<!--        <url-pattern>/account</url-pattern>-->
-<!--    </servlet-mapping>-->
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>LogInController</servlet-name>-->
+    <!--        <url-pattern>/logIn</url-pattern>-->
+    <!--    </servlet-mapping>-->
 
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>UpdateAccountController</servlet-name>-->
-<!--        <url-pattern>/update</url-pattern>-->
-<!--    </servlet-mapping>-->
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>RegisterController</servlet-name>-->
+    <!--        <url-pattern>/register</url-pattern>-->
+    <!--    </servlet-mapping>-->
+    <!--    -->
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>AccountController</servlet-name>-->
+    <!--        <url-pattern>/account</url-pattern>-->
+    <!--    </servlet-mapping>-->
 
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>LogOutController</servlet-name>-->
-<!--        <url-pattern>/logOut</url-pattern>-->
-<!--    </servlet-mapping>-->
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>UpdateAccountController</servlet-name>-->
+    <!--        <url-pattern>/update</url-pattern>-->
+    <!--    </servlet-mapping>-->
 
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>DisplayPictureController</servlet-name>-->
-<!--        <url-pattern>/displayPicture</url-pattern>-->
-<!--    </servlet-mapping>-->
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>LogOutController</servlet-name>-->
+    <!--        <url-pattern>/logOut</url-pattern>-->
+    <!--    </servlet-mapping>-->
 
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>CreateGroupController</servlet-name>-->
-<!--        <url-pattern>/createGroup</url-pattern>-->
-<!--    </servlet-mapping>-->
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>DisplayPictureController</servlet-name>-->
+    <!--        <url-pattern>/displayPicture</url-pattern>-->
+    <!--    </servlet-mapping>-->
 
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>GroupController</servlet-name>-->
-<!--        <url-pattern>/group</url-pattern>-->
-<!--    </servlet-mapping>-->
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>CreateGroupController</servlet-name>-->
+    <!--        <url-pattern>/createGroup</url-pattern>-->
+    <!--    </servlet-mapping>-->
 
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>RequestController</servlet-name>-->
-<!--        <url-pattern>/request</url-pattern>-->
-<!--    </servlet-mapping>-->
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>GroupController</servlet-name>-->
+    <!--        <url-pattern>/group</url-pattern>-->
+    <!--    </servlet-mapping>-->
 
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>MemberProcessController</servlet-name>-->
-<!--        <url-pattern>/processMember</url-pattern>-->
-<!--    </servlet-mapping>-->
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>RequestController</servlet-name>-->
+    <!--        <url-pattern>/request</url-pattern>-->
+    <!--    </servlet-mapping>-->
 
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>FriendsController</servlet-name>-->
-<!--        <url-pattern>/friends</url-pattern>-->
-<!--    </servlet-mapping>-->
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>MemberProcessController</servlet-name>-->
+    <!--        <url-pattern>/processMember</url-pattern>-->
+    <!--    </servlet-mapping>-->
 
-<!--    <servlet-mapping>-->
-<!--        <servlet-name>SearchController</servlet-name>-->
-<!--        <url-pattern>/search</url-pattern>-->
-<!--    </servlet-mapping>-->
-    
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>FriendsController</servlet-name>-->
+    <!--        <url-pattern>/friends</url-pattern>-->
+    <!--    </servlet-mapping>-->
+
+    <!--    <servlet-mapping>-->
+    <!--        <servlet-name>SearchController</servlet-name>-->
+    <!--        <url-pattern>/search</url-pattern>-->
+    <!--    </servlet-mapping>-->
+
     <jsp-config>
         <jsp-property-group>
             <url-pattern>/</url-pattern>
@@ -184,5 +193,5 @@
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
-    
+
 </web-app>

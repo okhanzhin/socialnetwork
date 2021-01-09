@@ -34,5 +34,4 @@
         <bean id="authInterceptor"
               class="com.getjavajob.training.okhanzhin.socialnetwork.webapp.filter.AuthenticationInterceptor"/>
     </mvc:interceptors>
-
 </beans>

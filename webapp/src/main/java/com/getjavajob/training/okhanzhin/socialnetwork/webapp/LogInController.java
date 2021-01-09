@@ -28,10 +28,10 @@ public class LogInController extends HttpServlet {
 
     @RequestMapping(value = "/")
     public String index() {
-        return "redirect:/auth/login";
+        return "redirect:/login";
     }
 
-    @RequestMapping(value = "/auth/login", method = RequestMethod.GET)
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
     public ModelAndView showLogInForm() {
         return new ModelAndView("login");
     }
