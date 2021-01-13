@@ -4,6 +4,7 @@ import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
 import com.getjavajob.training.okhanzhin.socialnetwork.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,14 +27,14 @@ public class LogInController extends HttpServlet {
         this.accountService = accountService;
     }
 
-    @RequestMapping(value = "/")
+    @GetMapping("/")
     public String index() {
-        return "redirect:/login";
+        return "login";
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public ModelAndView showLogInForm() {
-        return new ModelAndView("login");
+    public String showLogInForm() {
+        return "login";
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)

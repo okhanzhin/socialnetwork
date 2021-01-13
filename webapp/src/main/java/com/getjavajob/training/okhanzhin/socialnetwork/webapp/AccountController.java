@@ -34,6 +34,7 @@ public class AccountController extends HttpServlet {
 
     @RequestMapping(value = "/setup")
     public String setUpAccount(HttpServletRequest request) {
+        System.out.println("Setup account to session");
         Account account = getAccountFromCookies(request);
         HttpSession session = request.getSession();
 

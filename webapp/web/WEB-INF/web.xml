@@ -5,30 +5,32 @@
          version="4.0">
 
 <!--    <welcome-file-list>-->
-<!--        <welcome-file>/login</welcome-file>-->
+<!--        <welcome-file>login</welcome-file>-->
 <!--    </welcome-file-list>-->
+
+    <display-name>SocialNetwork</display-name>
 
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
 
-<!--    <filter>-->
-<!--        <filter-name>CharacterEncodingFilter</filter-name>-->
-<!--        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>-->
-<!--        <init-param>-->
-<!--            <param-name>encoding</param-name>-->
-<!--            <param-value>UTF-8</param-value>-->
-<!--        </init-param>-->
-<!--        <init-param>-->
-<!--            <param-name>forceEncoding</param-name>-->
-<!--            <param-value>true</param-value>-->
-<!--        </init-param>-->
-<!--    </filter>-->
+    <filter>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
 
-<!--    <filter-mapping>-->
-<!--        <filter-name>CharacterEncodingFilter</filter-name>-->
-<!--        <url-pattern>/*</url-pattern>-->
-<!--    </filter-mapping>-->
+    <filter-mapping>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <servlet>
         <servlet-name>network</servlet-name>
@@ -180,12 +182,12 @@
     <!--        <url-pattern>/search</url-pattern>-->
     <!--    </servlet-mapping>-->
 
-    <jsp-config>
-        <jsp-property-group>
-            <url-pattern>/</url-pattern>
-            <trim-directive-whitespaces>true</trim-directive-whitespaces>
-        </jsp-property-group>
-    </jsp-config>
+<!--    <jsp-config>-->
+<!--        <jsp-property-group>-->
+<!--            <url-pattern>*.jsp</url-pattern>-->
+<!--            <trim-directive-whitespaces>true</trim-directive-whitespaces>-->
+<!--        </jsp-property-group>-->
+<!--    </jsp-config>-->
 
     <resource-ref>
         <description>Production DB</description>

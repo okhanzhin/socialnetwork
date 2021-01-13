@@ -21,7 +21,7 @@
         <div class="col-4">
             <h3>Create a new account</h3>
 
-            <sf:form action="<%= request.getContextPath() %>/account/new" method="post"
+            <sf:form action="/account/new" method="post"
                      modelAttribute = "account" enctype="multipart/form-data">
 
                 <div class="input-group input-group-sm mb-3">

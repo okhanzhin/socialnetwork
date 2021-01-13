@@ -19,7 +19,7 @@
 <div class="container">
     <div class="row justify-content-center align-items-center vh-100">
         <div class="col-4">
-            <form action="${pageContext.request.contextPath}/auth/login" method="post">
+            <form action="${pageContext.request.contextPath}/login" method="post">
                 <div class="form-group">
                     <label for="exampleInputEmail1">Email address</label>
                     <input type="email" class="form-control" id="exampleInputEmail1" name="email"
@@ -46,7 +46,7 @@
                     LogIn
                 </button>
                 <button type="button" class="btn btn-outline-warning">
-                    <a href="<c:url value="/account/new"/>" style="color:inherit">
+                    <a href="<c:url value="${pageContext.request.contextPath}/account/new"/>" style="color:inherit">
                         SignUp
                     </a>
                 </button>
