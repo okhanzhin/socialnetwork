@@ -6,23 +6,19 @@ import com.getjavajob.training.okhanzhin.socialnetwork.service.AccountService;
 import com.getjavajob.training.okhanzhin.socialnetwork.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
-import static java.lang.Long.parseLong;
-
 @Controller
 @RequestMapping(value = "/account")
-public class AccountController extends HttpServlet {
+public class AccountController {
     private final AccountService accountService;
     private final GroupService groupService;
 

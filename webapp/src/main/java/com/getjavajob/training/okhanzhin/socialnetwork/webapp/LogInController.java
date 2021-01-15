@@ -8,16 +8,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller
-public class LogInController extends HttpServlet {
+public class LogInController {
     private static final int COOKIE_AGE = 7 * 24 * 60 * 60;
 
     private final AccountService accountService;
@@ -59,7 +57,7 @@ public class LogInController extends HttpServlet {
             session.setAttribute("account", account);
             return "redirect:/account/" + account.getAccountID();
         } else {
-            request.setAttribute("logPasError", "Email/Password is invalid.");
+            request.setAttribute("logPasError", "Failed to log in. Invalid Log/Password");
             return "login";
         }
     }

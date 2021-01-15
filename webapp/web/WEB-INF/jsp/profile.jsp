@@ -16,7 +16,7 @@
 
     <style>
         form {
-            margin-bottom: 0
+            c
         }
     </style>
 
@@ -60,7 +60,7 @@
                     <br><br>
                     <button type="button" class="btn btn-outline-warning">
                         <a href="<c:url value="/auth/logout"/>" style="color: lightcoral">
-                            LogOut
+                            Log Out
                         </a>
 <%--                        <button type="button" class="btn btn-outline-warning">--%>
 <%--                            <a href="<c:url value="/update?id=${sessionScope.account.accountID}"/>" style="color: navy">--%>

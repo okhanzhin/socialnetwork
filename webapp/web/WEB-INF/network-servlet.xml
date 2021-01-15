@@ -30,8 +30,13 @@
     <mvc:resources mapping="/resources/scripts/**" location="/resources/scripts/"/>
     <mvc:resources mapping="/resources/img/**" location="/resources/img/"/>
 
-    <mvc:interceptors>
-        <bean id="authInterceptor"
-              class="com.getjavajob.training.okhanzhin.socialnetwork.webapp.filter.AuthenticationInterceptor"/>
-    </mvc:interceptors>
+<!--    <mvc:interceptors>-->
+<!--        <mvc:interceptor>-->
+<!--        <mvc:mapping path="/login"/>-->
+<!--        <mvc:mapping path="/"/>-->
+<!--        <mvc:mapping path="/account/new"/>-->
+<!--        <bean id="authInterceptor"-->
+<!--              class="com.getjavajob.training.okhanzhin.socialnetwork.webapp.filter.AuthenticationInterceptor"/>-->
+<!--        </mvc:interceptor>-->
+<!--    </mvc:interceptors>-->
 </beans>

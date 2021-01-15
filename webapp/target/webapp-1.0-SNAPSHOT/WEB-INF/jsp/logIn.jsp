@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page session="false" %>
 <!doctype html>
 <html lang="en">
 <head>
@@ -42,12 +43,13 @@
                         <c:out value="${requestScope.logPasError}"/>
                     </div>
                 </c:if>
+
                 <button type="submit" class="btn btn-primary" name="Save" value="Save">
-                    LogIn
+                    Log In
                 </button>
                 <button type="button" class="btn btn-outline-warning">
                     <a href="<c:url value="${pageContext.request.contextPath}/account/new"/>" style="color:inherit">
-                        SignUp
+                        Sign Up
                     </a>
                 </button>
             </form>

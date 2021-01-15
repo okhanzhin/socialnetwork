@@ -4,29 +4,24 @@ import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Phone;
 import com.getjavajob.training.okhanzhin.socialnetwork.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
-import javax.servlet.http.*;
-import java.io.ByteArrayOutputStream;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @MultipartConfig
 @Controller
 @RequestMapping(value = "/account")
-public class RegisterController extends HttpServlet {
+public class RegisterController {
     private final AccountService accountService;
 
     @Autowired
