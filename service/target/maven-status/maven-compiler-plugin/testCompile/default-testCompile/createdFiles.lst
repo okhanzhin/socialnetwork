@@ -1,3 +1,8 @@
 com/getjavajob/training/okhanzhin/socialnetwork/service/AccountServiceTest.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/ChatMessageServiceTest.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/SearchServiceTest.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/RelationshipServiceTest.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/CommunityServiceTest.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/PictureServiceTest.class
 com/getjavajob/training/okhanzhin/socialnetwork/service/RequestServiceTest.class
-com/getjavajob/training/okhanzhin/socialnetwork/service/GroupServiceTest.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/PostServiceTest.class

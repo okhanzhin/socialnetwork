@@ -1,10 +1,32 @@
 package com.getjavajob.training.okhanzhin.socialnetwork.domain;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.Objects;
 
+@Entity
+@Table(name = "phones")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Phone {
-    private long phoneID;
-    private long accountID;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(updatable = false, nullable = false)
+    @XmlTransient
+    private Long phoneID;
+    @ManyToOne
+    @JoinColumn(name = "accountID", nullable = false)
+    @XmlTransient
+    private Account account;
     private String phoneNumber;
     private String phoneType;
 
@@ -13,28 +35,33 @@ public class Phone {
         this.phoneType = phoneType;
     }
 
-    public Phone(long accountID, String phoneNumber, String phoneType) {
+    public Phone(Account account, String phoneNumber, String phoneType) {
         this(phoneNumber, phoneType);
-        this.accountID = accountID;
+        this.account = account;
+    }
+
+    public Phone(Long phoneID, Account account, String phoneNumber, String phoneType) {
+        this(account, phoneNumber, phoneType);
+        this.phoneID = phoneID;
     }
 
     public Phone() {
     }
 
-    public long getPhoneID() {
+    public Long getPhoneID() {
         return phoneID;
     }
 
-    public void setPhoneID(long phoneID) {
+    public void setPhoneID(Long phoneID) {
         this.phoneID = phoneID;
     }
 
-    public long getAccountID() {
-        return accountID;
+    public Account getAccount() {
+        return account;
     }
 
-    public void setAccountID(long accountID) {
-        this.accountID = accountID;
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
     public String getPhoneNumber() {
@@ -58,14 +85,14 @@ public class Phone {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Phone phone = (Phone) o;
-        return accountID == phone.accountID &&
+        return account.getAccountID().equals(phone.account.getAccountID()) &&
                 Objects.equals(phoneNumber, phone.phoneNumber) &&
                 Objects.equals(phoneType, phone.phoneType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(phoneID, accountID, phoneNumber, phoneType);
+        return Objects.hash(phoneID, account.getAccountID(), phoneNumber, phoneType);
     }
 
     @Override
@@ -73,7 +100,7 @@ public class Phone {
         return new StringBuilder().
                 append("Phone{").
                 append("id='").append(phoneID).append('\'').
-                append(", accountID=").append(accountID).append('\'').
+                append(", accountID=").append(account.getAccountID()).append('\'').
                 append(", phoneNumber='").append(phoneNumber).append('\'').
                 append(", phoneType='").append(phoneType).append('\'').
                 append('}').toString();

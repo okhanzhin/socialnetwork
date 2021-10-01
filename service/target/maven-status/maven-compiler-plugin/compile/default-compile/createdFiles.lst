@@ -1,4 +1,15 @@
-com/getjavajob/training/okhanzhin/socialnetwork/service/GroupService.class
-com/getjavajob/training/okhanzhin/socialnetwork/service/RequestService.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/SearchService.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/PostService.class
 com/getjavajob/training/okhanzhin/socialnetwork/service/AccountService.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/NotificationService.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/ChatMessageService.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/PictureService.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/utils/TransferEntityConverter.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/config/ServiceConfig.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/RequestService.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/config/JmsConfig.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/CommunityService.class
 com/getjavajob/training/okhanzhin/socialnetwork/service/ServiceException.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/XmlMarshallingService.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/security/UserDetailsServiceImpl.class
+com/getjavajob/training/okhanzhin/socialnetwork/service/RelationService.class

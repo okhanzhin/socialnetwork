@@ -1,66 +1,350 @@
 :root {
-  --success-color: #2ecc71;
-  --error-color: #e74c3c;
+    --success-color: #2ecc71;
+    --error-color: #e74c3c;
+    --item-list-padding: 25px;
+}
+
+.main-label {
+    display: inline-block;
+    margin: 0 auto;
+    padding: 0 25px;
+    text-align: center;
+    font-size: 85px;
+    margin-bottom: 70px;
+    border: 3px solid #333;
+    border-radius: 5px 5px 5px 5px/25px 25px 25px 5px;
+}
+
+@media screen and (max-width: 720px) {
+    .main-label {
+        font-size: 6vw;
+    }
+}
+
+.main-label span {
+    width: auto;
+}
+
+.login-form {
+    text-align: center;
+}
+
+.login-form .card {
+    text-align: left;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
 .invalid {
-  border-color: red;
+    border-color: red;
 }
 
 #error {
-  color: red
+    color: red
+}
+
+.avatar {
+    width: 250px;
+    height: 250px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    margin: auto;
 }
 
 .form-control {
-  /*margin-bottom: 10px;*/
-  /*padding-bottom: 20px;*/
-  position: relative;
+    background-color: whitesmoke;
+    position: relative;
 }
 
 .form-control label {
-  color: #777;
-  display: block;
-  margin-bottom: 5px;
+    color: #777;
+    display: block;
+    margin-bottom: 5px;
 }
 
 .form-control input {
-  /*border: 2px solid #f0f0f0;*/
-  border-radius: 4px;
-  display: block;
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
+    border-radius: 4px;
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
 }
 
 .form-control input:focus {
-  outline: 0;
-  border-color: #777;
+    outline: 0;
+    border-color: #777;
 }
 
 .form-control.success input {
-  border-color: var(--success-color);
+    border-color: var(--success-color);
 }
 
 .form-control.error input {
-  border-color: var(--error-color);
+    border-color: var(--error-color);
 }
 
 .form-control small {
-  color: var(--error-color);
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  visibility: hidden;
+    color: var(--error-color);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    visibility: hidden;
 }
 
 .form-control.error small {
-  visibility: visible;
+    visibility: visible;
 }
 
 .input-error {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  visibility: hidden;
-  top: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    visibility: hidden;
+    top: 100%;
 }
+
+body {
+    background-color: floralwhite;
+}
+
+.navbar {
+    border: none;
+    background-color: #9F9FAD;
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+    background-color: #aecfdf;
+}
+
+.nav-tabs .nav-link {
+    border-width: 2px;
+}
+
+.nav-tabs .nav-link:hover {
+    color: whitesmoke;
+}
+
+#hiddenFields {
+    display: none;
+}
+
+#paginationPanel {
+    padding: 0 var(--item-list-padding);
+}
+
+.pagination:empty {
+    margin-bottom: 0;
+}
+
+.small-pic {
+    object-fit: cover;
+}
+
+.small-pic-container {
+    width: 70px;
+    height: 70px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+}
+
+.card {
+    background-color: #aecfdf;
+}
+
+.card-alter {
+    background-color: #7EB1C9;
+}
+
+.card-inner-element {
+    background-color: #C5DCE7;
+}
+
+.empty-list-message {
+    border: 2px solid black;
+    border-radius: 5px 5px 5px 5px/25px 25px 25px 5px;
+    display: inline-block;
+    padding: 15px 20px;
+    margin: 15px 0;
+    background-color: #C5DCE7;
+}
+
+.tab-content {
+    background-color: #aecfdf;
+}
+
+.item-list {
+    padding: 15px var(--item-list-padding) 0;
+    margin-bottom: 15px;
+}
+
+.item-list:not(:first-child) {
+    padding-top: 0;
+}
+
+.card-header {
+    background-color: #81e4da;
+}
+
+.btn-info {
+    color: black;
+    background-color: #81e4da;
+    border-color: #81e4da;
+}
+
+.btn-warning {
+    color: black;
+    background-color: #47e5bc;
+    border-color: #47e5bc;
+}
+
+.btn-warning:hover {
+    color: whitesmoke;
+    background-color: #1FD6A5;
+    border-color: #1FD6A5;
+}
+
+.btn-main {
+    color: black;
+    background-color: #676779;
+    border-color: #676779;
+}
+
+.btn-edit-phone {
+    color: black;
+    background-color: #D4E5ED;
+    border-color: #676779;
+}
+
+.btn-delete {
+    color: whitesmoke;
+    background-color: #dc6a6a;
+}
+
+.btn-delete:hover {
+    color: whitesmoke;
+    background-color: #e24a4a;
+}
+
+.additional-info {
+    display: none;
+}
+
+#toggle-additional-info {
+    display: none;
+}
+
+.toggle-additional-info {
+    background-color: #9AEAE2;
+    display: block;
+    padding: .5rem;
+    color: white;
+    text-align: center;
+}
+
+.toggle-additional-info::before {
+    content: "Show Info";
+    display: block;
+}
+
+#toggle-additional-info:checked ~ .toggle-additional-info {
+    background-color: powderblue;
+}
+
+#toggle-additional-info:checked ~ .toggle-additional-info::before {
+    content: "Hide Info";
+}
+
+#toggle-additional-info:checked ~ .additional-info {
+    display: block;
+}
+
+#exampleFormControlTextarea1:focus {
+    min-height: 5rem;
+}
+
+/*add cause back color became grey*/
+.table {
+    --bs-table-accent-bg: none;
+}
+
+.table-borderless th {
+    width: 30%;
+}
+
+.input-community-prepend {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.input-column {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-column:first-child {
+    width: 30%;
+}
+
+.input-column:last-child {
+    width: 70%;
+}
+
+.table td, .table th {
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+}
+
+.chat-body {
+    position: relative;
+}
+
+.chat-interlocutor-label {
+    border: 2px solid black;
+    border-radius: 5px 5px 5px 5px/25px 25px 25px 5px;
+    display: inline-block;
+    padding: 15px 20px;
+    background-color: #9AC2D5;
+}
+
+.chat-window {
+    background-color: #C5DCE7;
+    max-height: 500px;
+    overflow: auto;
+}
+
+.chat-message {
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-message-content {
+    max-width: 60%;
+}
+
+.chat-message.text-right .chat-message-content {
+    align-self: flex-end;
+}
+
+.chat-delete {
+    position: absolute;
+    top: 35px;
+    right: 570px;
+}
+
+.ui-autocomplete {
+    overflow: auto;
+    max-height: 300px;
+}
+
+.ui-autocomplete .ui-menu-item {
+    overflow: hidden;
+}
+
+a {
+    text-decoration: none;
+}
+
+

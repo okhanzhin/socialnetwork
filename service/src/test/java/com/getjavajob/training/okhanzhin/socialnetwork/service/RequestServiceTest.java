@@ -1,135 +1,215 @@
 package com.getjavajob.training.okhanzhin.socialnetwork.service;
 
-import com.getjavajob.training.okhanzhin.socialnetwork.dao.RequestDao;
+import com.getjavajob.training.okhanzhin.socialnetwork.dao.interfaces.RequestRepository;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
-import com.getjavajob.training.okhanzhin.socialnetwork.domain.Group;
-import com.getjavajob.training.okhanzhin.socialnetwork.domain.Request;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.Community;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.request.AccountRequest;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.request.CommunityRequest;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.request.Request;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RequestServiceTest {
+    private static final String ROLE_USER = "USER";
+
     @Mock
-    private RequestDao requestDao;
+    private RequestRepository requestRepository;
 
     @InjectMocks
     private RequestService requestService;
 
-    @Test
-    public void createRequest() {
-        Request request = new Request(1, 1, "user", Request.Status.UNCONFIRMED);
+    private Account homeAccount;
+    private Account account;
+    private Account account2;
+    private Account account3;
+    private Community community;
 
-        when(requestDao.create(request)).thenReturn(request);
-        requestService.createRequest(request);
-        verify(requestDao).create(request);
+    @Before
+    public void init() {
+        homeAccount = new Account(4L, "Home", "Home",
+                "home@gmail.com", "onepass", LocalDate.now(), ROLE_USER);
+        account = new Account(1L, "One", "One",
+                "onee221@gmail.com", "onepass", LocalDate.now(), ROLE_USER);
+        account2 = new Account(2L, "Two", "Two",
+                "onee222@gmail.com", "onepass", LocalDate.now(), ROLE_USER);
+        account3 = new Account(3L, "Three", "Three",
+                "onee223@gmail.com", "onepass", LocalDate.now(), ROLE_USER);
+        community = new Community(1L, "First Community", LocalDate.now());
     }
 
     @Test
-    public void acceptRequest() {
-        Request request = new Request(1, 1, "user", Request.Status.UNCONFIRMED);
+    public void createAccountRequest() {
+        Request accountRequest = new AccountRequest(1L, account, account2, Request.Status.UNCONFIRMED);
 
-        requestService.acceptRequest(request);
-        verify(requestDao).update(request);
+        when(requestRepository.create(accountRequest)).thenReturn(accountRequest);
+
+        assertEquals(accountRequest, requestService.createAccountRequest(account, account2));
+        verify(requestRepository).create(accountRequest);
     }
+
+    @Test
+    public void createCommunityRequest() {
+        Request communityRequest = new CommunityRequest(1L, account, community, Request.Status.UNCONFIRMED);
+
+        when(requestRepository.create(communityRequest)).thenReturn(communityRequest);
+
+        assertEquals(communityRequest, requestService.createCommunityRequest(account, community));
+        verify(requestRepository).create(communityRequest);
+    }
+
+    @Test
+    public void acceptAccountRequest() {
+        Request unconfirmedRequest = new AccountRequest(1L, account, account2, Request.Status.UNCONFIRMED);
+        Request confirmedRequest = new AccountRequest(1L, account, account2, Request.Status.ACCEPTED);
+
+        when(requestRepository.getAccountRequest(account, account2)).thenReturn(unconfirmedRequest);
+        when(requestRepository.update(confirmedRequest)).thenReturn(confirmedRequest);
+
+        assertEquals(confirmedRequest, requestService.acceptAccountRequest(account, account2));
+        verify(requestRepository).update(confirmedRequest);
+    }
+
+    @Test
+    public void acceptCommunityRequest() {
+        Request unconfirmedRequest = new CommunityRequest(1L, account, community, Request.Status.UNCONFIRMED);
+        Request confirmedRequest = new CommunityRequest(1L, account, community, Request.Status.ACCEPTED);
+
+        when(requestRepository.getCommunityRequest(account, community)).thenReturn(unconfirmedRequest);
+        when(requestRepository.update(confirmedRequest)).thenReturn(confirmedRequest);
+
+        assertEquals(confirmedRequest, requestService.acceptCommunityRequest(account, community));
+        verify(requestRepository).update(confirmedRequest);
+    }
+
 
     @Test
     public void deleteRequest() {
-        Request request = new Request(1, 1, "user", Request.Status.UNCONFIRMED);
-        request.setRequestID(1);
+        Request accountRequest = new AccountRequest(1L, account, account2, Request.Status.UNCONFIRMED);
 
-        requestService.deleteRequest(request);
-        verify(requestDao).deleteById(request.getRequestID());
+        requestService.deleteRequest(accountRequest);
+        verify(requestRepository).deleteById(accountRequest.getRequestID());
     }
 
     @Test
     public void getById() {
-        Request request = new Request(1, 1, "user", Request.Status.UNCONFIRMED);
-        request.setRequestID(1);
+        Request accountRequest = new AccountRequest(1L, account, account2, Request.Status.UNCONFIRMED);
 
-        requestService.getById(request.getRequestID());
-        verify(requestDao).getById(request.getRequestID());
+        when(requestRepository.getById(accountRequest.getRequestID())).thenReturn(accountRequest);
+
+        assertEquals(accountRequest, requestService.getById(accountRequest.getRequestID()));
+        verify(requestRepository).getById(accountRequest.getRequestID());
     }
 
     @Test
     public void setRequestUnconfirmed() {
-        Request request = new Request(1, 1, "user", Request.Status.ACCEPTED);
-        request.setRequestID(1);
+        Request confirmedRequest = new AccountRequest(1L, account, account2, Request.Status.ACCEPTED);
+        Request unconfirmedRequest = new AccountRequest(1L, account, account2, Request.Status.UNCONFIRMED);
 
-        requestService.setRequestUnconfirmed(request);
-        verify(requestDao).update(request);
+        when(requestRepository.update(confirmedRequest)).thenReturn(unconfirmedRequest);
+
+        requestService.setRequestUnconfirmed(confirmedRequest);
+        verify(requestRepository).update(confirmedRequest);
     }
 
     @Test
-    public void getByCreatorRecipientID() {
-        Request request = new Request(1, 1, "user", Request.Status.ACCEPTED);
-        request.setRequestID(1);
+    public void getAccountRequest() {
+        Request accountRequest = new AccountRequest(1L, account, account2, Request.Status.ACCEPTED);
 
-        when(requestDao.getByCreatorRecipientID(request.getCreatorID(), request.getRecipientID())).thenReturn(request);
-        requestService.getByCreatorRecipientID(request.getCreatorID(), request.getRecipientID());
-        verify(requestDao).getByCreatorRecipientID(request.getCreatorID(), request.getRecipientID());
+        when(requestRepository.getAccountRequest(account, account2)).thenReturn(accountRequest);
+
+        assertEquals(accountRequest, requestService.getAccountRequest(account, account2));
+        verify(requestRepository).getAccountRequest(account, account2);
     }
 
     @Test
-    public void getListOfGroupRequests() {
-        Group group = new Group("First Group");
-        group.setGroupID(1);
-        Request request1 = new Request(1, group.getGroupID(), "user", Request.Status.UNCONFIRMED);
-        Request request2 = new Request(2, group.getGroupID(), "user", Request.Status.UNCONFIRMED);
-        Request request3 = new Request(3, group.getGroupID(), "user", Request.Status.UNCONFIRMED);
+    public void getRequestingAccounts() {
+        Request communityRequest = new CommunityRequest(1L, account, community, Request.Status.ACCEPTED);
+
+        when(requestRepository.getCommunityRequest(account, community)).thenReturn(communityRequest);
+
+        assertEquals(communityRequest, requestService.getCommunityRequest(account, community));
+        verify(requestRepository).getCommunityRequest(account, community);
+    }
+
+    @Test
+    public void getListOfCommunityRequests() {
+        Request request1 = new CommunityRequest(1L, account, community, Request.Status.UNCONFIRMED);
+        Request request2 = new CommunityRequest(2L, account2, community, Request.Status.UNCONFIRMED);
+        Request request3 = new CommunityRequest(3L, account3, community, Request.Status.UNCONFIRMED);
         List<Request> requests = Arrays.asList(request1, request2, request3);
+        List<Account> accounts = new ArrayList<>();
 
-        when(requestDao.getGroupRequestsList(group)).thenReturn(requests);
-        requestService.getListOfGroupRequests(group);
-        verify(requestDao).getGroupRequestsList(group);
+        for (Request request : requests) {
+            accounts.add(request.getSource());
+        }
+
+        when(requestRepository.getCommunityRequests(community)).thenReturn(requests);
+
+        assertEquals(accounts, requestService.getRequestingAccounts(community));
+        verify(requestRepository).getCommunityRequests(community);
     }
 
     @Test
     public void getPendingRequests() {
-        Account account = new Account(1, "One", "One", "onee221@gmail.com", "onepass", LocalDate.now());
-        Request request1 = new Request(1, account.getAccountID(), "user", Request.Status.UNCONFIRMED);
-        Request request2 = new Request(2, account.getAccountID(), "user", Request.Status.UNCONFIRMED);
-        Request request3 = new Request(3, account.getAccountID(), "user", Request.Status.UNCONFIRMED);
+        Request request1 = new AccountRequest(1L, account, homeAccount, Request.Status.UNCONFIRMED);
+        Request request2 = new AccountRequest(2L, account2, homeAccount, Request.Status.UNCONFIRMED);
+        Request request3 = new AccountRequest(3L, account3, homeAccount, Request.Status.UNCONFIRMED);
         List<Request> requests = Arrays.asList(request1, request2, request3);
+        List<Account> accounts = new ArrayList<>();
 
-        when(requestDao.getPendingRequestsList(account)).thenReturn(requests);
-        requestService.getPendingRequests(account);
-        verify(requestDao).getPendingRequestsList(account);
+        for (Request request : requests) {
+            accounts.add(request.getSource());
+        }
+
+        when(requestRepository.getPendingRequests(homeAccount)).thenReturn(requests);
+
+        assertEquals(accounts, requestService.getPendingAccounts(homeAccount));
+        verify(requestRepository).getPendingRequests(homeAccount);
     }
 
     @Test
     public void getOutgoingRequests() {
-        Account account = new Account(1, "One", "One", "onee221@gmail.com", "onepass", LocalDate.now());
-        Request request1 = new Request(account.getAccountID(), 1, "user", Request.Status.UNCONFIRMED);
-        Request request2 = new Request(account.getAccountID(), 2, "user", Request.Status.UNCONFIRMED);
-        Request request3 = new Request(account.getAccountID(), 3, "user", Request.Status.UNCONFIRMED);
+        Request request1 = new AccountRequest(1L, homeAccount, account, Request.Status.UNCONFIRMED);
+        Request request2 = new AccountRequest(2L, homeAccount, account2, Request.Status.UNCONFIRMED);
+        Request request3 = new AccountRequest(3L, homeAccount, account3, Request.Status.UNCONFIRMED);
         List<Request> requests = Arrays.asList(request1, request2, request3);
+        List<Account> accounts = new ArrayList<>();
 
-        when(requestDao.getOutgoingRequestsList(account)).thenReturn(requests);
-        requestService.getOutgoingRequests(account);
-        verify(requestDao).getOutgoingRequestsList(account);
+        for (Request request : requests) {
+            AccountRequest accountRequest = (AccountRequest) request;
+            accounts.add(accountRequest.getAccountTarget());
+        }
+
+        when(requestRepository.getOutgoingRequests(homeAccount)).thenReturn(requests);
+
+        assertEquals(accounts, requestService.getOutgoingAccounts(homeAccount));
+        verify(requestRepository).getOutgoingRequests(homeAccount);
     }
 
     @Test
     public void getAcceptedRequests() {
-        Account account = new Account(1, "One", "One", "onee221@gmail.com", "onepass", LocalDate.now());
-        Request request1 = new Request(account.getAccountID(), 1, "user", Request.Status.ACCEPTED);
-        Request request2 = new Request(account.getAccountID(), 2, "user", Request.Status.ACCEPTED);
-        Request request3 = new Request(account.getAccountID(), 3, "user", Request.Status.ACCEPTED);
+        Request request1 = new AccountRequest(1L, homeAccount, account, Request.Status.ACCEPTED);
+        Request request2 = new AccountRequest(2L, homeAccount, account2, Request.Status.ACCEPTED);
+        Request request3 = new AccountRequest(3L, homeAccount, account3, Request.Status.ACCEPTED);
         List<Request> requests = Arrays.asList(request1, request2, request3);
 
-        when(requestDao.getAcceptedRequestsList(account)).thenReturn(requests);
-        requestService.getAcceptedRequests(account);
-        verify(requestDao).getAcceptedRequestsList(account);
+        when(requestRepository.getAcceptedRequestsList(homeAccount)).thenReturn(requests);
+
+        assertEquals(requests, requestService.getAcceptedRequests(homeAccount));
+        verify(requestRepository).getAcceptedRequestsList(homeAccount);
     }
 }

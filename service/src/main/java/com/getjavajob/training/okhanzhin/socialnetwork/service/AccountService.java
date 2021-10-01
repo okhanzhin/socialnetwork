@@ -1,14 +1,18 @@
 package com.getjavajob.training.okhanzhin.socialnetwork.service;
 
-import com.getjavajob.training.okhanzhin.socialnetwork.dao.AccountDao;
-import com.getjavajob.training.okhanzhin.socialnetwork.dao.PhoneDao;
-import com.getjavajob.training.okhanzhin.socialnetwork.dao.RelationshipDao;
-import com.getjavajob.training.okhanzhin.socialnetwork.dao.RequestDao;
+import com.getjavajob.training.okhanzhin.socialnetwork.dao.interfaces.AccountRepository;
+import com.getjavajob.training.okhanzhin.socialnetwork.dao.interfaces.PictureRepository;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
-import com.getjavajob.training.okhanzhin.socialnetwork.domain.Group;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.Community;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Phone;
-import com.getjavajob.training.okhanzhin.socialnetwork.domain.Request;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.dto.AccountTransfer;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.dto.SecurityAccount;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.picture.AccountPicture;
+import com.getjavajob.training.okhanzhin.socialnetwork.service.utils.TransferEntityConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,343 +20,197 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AccountService {
-    public static final int RECORDS_PER_PAGE = 8;
+    private static final String EMPTY_PHONE_INPUT = "";
+    private static final String ADMIN = "ADMIN";
+    private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
 
-    private final AccountDao accountDao;
-    private final PhoneDao phoneDao;
-    private final RelationshipDao relationDao;
-    private final RequestDao requestDao;
+    private final AccountRepository accountRepository;
+    private final PictureRepository pictureRepository;
 
     @Autowired
-    public AccountService(AccountDao accountDao, PhoneDao phoneDao, RelationshipDao relationDao, RequestDao requestDao) {
-        this.accountDao = accountDao;
-        this.phoneDao = phoneDao;
-        this.relationDao = relationDao;
-        this.requestDao = requestDao;
+    public AccountService(AccountRepository accountRepository, PictureRepository pictureRepository) {
+        this.accountRepository = accountRepository;
+        this.pictureRepository = pictureRepository;
+    }
+
+    public Account getEntity(AccountTransfer transfer) {
+        TransferEntityConverter<AccountTransfer, Account> converter = new TransferEntityConverter<>();
+
+        return Objects.requireNonNull(converter.buildEntity(transfer, Account.class));
+    }
+
+
+    public AccountTransfer getTransfer(Account account) {
+        TransferEntityConverter<Account, AccountTransfer> converter = new TransferEntityConverter<>();
+        AccountTransfer transfer = Objects.requireNonNull(converter.buildTransfer(account, AccountTransfer.class));
+        if (account.isPicAttached()) {
+            transfer.setPicture(pictureRepository.getAccountPicture(account).getContent());
+        }
+
+        return transfer;
     }
 
     @Transactional
-    public Account createAccount(Account account) {
+    public Account create(AccountTransfer transfer) {
+        if (!transfer.isPicAttached()) {
+            transfer.setPicture(new byte[0]);
+        }
+
+        Account account = getEntity(transfer);
         account.setDateOfRegistration(LocalDate.now());
-        Account newAccount = accountDao.create(account);
-        List<Phone> phones = new ArrayList<>();
 
         if (account.getPhones() != null) {
             for (Phone phone : account.getPhones()) {
-                phone.setAccountID(account.getAccountID());
-                phones.add(phoneDao.create(phone));
+                phone.setAccount(account);
             }
-            newAccount.setPhones(phones);
         }
 
-        return newAccount;
+        AccountPicture picture = new AccountPicture(transfer.getPicture());
+        picture.setAccount(account);
+
+        pictureRepository.create(picture);
+        logger.info("Account ID {} has been created.", account.getAccountID());
+
+        return account;
     }
 
     @Transactional
-    public void updateAccount(Account account) {
-        Account updatableAccount = accountDao.getById(account.getAccountID());
-        List<Phone> storagePhones = phoneDao.getAllPhonesByAccountId(updatableAccount.getAccountID());
+    public Account update(AccountTransfer transfer) {
+        Account storedAccount = accountRepository.getByIdFetchPhones(transfer.getAccountID());
 
-        if (storagePhones.size() != 0) {
-            updatableAccount.setPhones(storagePhones);
-        } else {
-            updatableAccount.setPhones(null);
-        }
-
-        if (!updatableAccount.getSurname().equals(account.getSurname())) {
-            updatableAccount.setSurname(account.getSurname());
-        }
-        if (!updatableAccount.getName().equals(account.getName())) {
-            updatableAccount.setName(account.getName());
-        }
-
-        if (account.getMiddlename() != null && account.getMiddlename().length() != 0) {
-            if (updatableAccount.getMiddlename() == null) {
-                updatableAccount.setMiddlename(account.getMiddlename());
-            } else {
-                if (!updatableAccount.getMiddlename().equals(account.getMiddlename())) {
-                    updatableAccount.setMiddlename(account.getMiddlename());
-                }
-            }
-        } else if (account.getMiddlename() != null && account.getMiddlename().length() == 0) {
-            updatableAccount.setMiddlename(null);
-        }
-
-        if (account.getDateOfBirth() != null) {
-            if (updatableAccount.getDateOfBirth() == null) {
-                updatableAccount.setDateOfBirth(account.getDateOfBirth());
-            } else if (updatableAccount.getDateOfBirth() != null) {
-                if (!updatableAccount.getDateOfBirth().equals(account.getDateOfBirth())) {
-                    updatableAccount.setDateOfBirth(account.getDateOfBirth());
-                }
-            }
-        } else {
-            updatableAccount.setDateOfBirth(null);
-        }
-
-        if (account.getSkype() != null && account.getSkype().length() != 0) {
-            if (updatableAccount.getSkype() == null) {
-                updatableAccount.setSkype(account.getSkype());
-            } else {
-                if (!updatableAccount.getSkype().equals(account.getSkype())) {
-                    updatableAccount.setSkype(account.getSkype());
-                }
-            }
-        } else if (account.getSkype() != null && account.getSkype().length() == 0) {
-            updatableAccount.setSkype(null);
-        }
-
-        if (account.getIcq() != null && account.getIcq().length() != 0) {
-            if (updatableAccount.getIcq() == null) {
-                updatableAccount.setIcq(account.getIcq());
-            } else {
-                if (!updatableAccount.getIcq().equals(account.getIcq())) {
-                    updatableAccount.setIcq(account.getIcq());
-                }
-            }
-        } else if (account.getIcq() != null && account.getIcq().length() == 0) {
-            updatableAccount.setIcq(null);
-        }
-
-        if (account.getHomeAddress() != null && account.getHomeAddress().length() != 0) {
-            if (updatableAccount.getHomeAddress() == null) {
-                updatableAccount.setHomeAddress(account.getHomeAddress());
-            } else {
-                if (!updatableAccount.getHomeAddress().equals(account.getHomeAddress())) {
-                    updatableAccount.setHomeAddress(account.getHomeAddress());
-                }
-            }
-        } else if (account.getHomeAddress() != null && account.getHomeAddress().length() == 0) {
-            updatableAccount.setHomeAddress(null);
-        }
-
-        if (account.getWorkAddress() != null && account.getWorkAddress().length() != 0) {
-            if (updatableAccount.getWorkAddress() == null) {
-                updatableAccount.setWorkAddress(account.getWorkAddress());
-            } else {
-                if (!updatableAccount.getWorkAddress().equals(account.getWorkAddress())) {
-                    updatableAccount.setWorkAddress(account.getWorkAddress());
-                }
-            }
-        } else if (account.getWorkAddress() != null && account.getWorkAddress().length() == 0) {
-            updatableAccount.setWorkAddress(null);
-        }
-
-        if (account.getAddInfo() != null && account.getAddInfo().length() != 0) {
-            if (updatableAccount.getAddInfo() == null) {
-                updatableAccount.setAddInfo(account.getAddInfo());
-            } else {
-                if (!updatableAccount.getAddInfo().equals(account.getAddInfo())) {
-                    updatableAccount.setAddInfo(account.getAddInfo());
-                }
-            }
-        } else if (account.getAddInfo() != null && account.getAddInfo().length() == 0) {
-            updatableAccount.setAddInfo(account.getAddInfo());
-        }
-
-        if (account.getRole() != null && account.getRole().length() != 0) {
-            if (updatableAccount.getRole() == null) {
-                updatableAccount.setRole(account.getRole());
-            } else {
-                if (!updatableAccount.getRole().equals(account.getRole())) {
-                    updatableAccount.setRole(account.getRole());
-                }
-            }
-        } else if (account.getRole() != null && account.getRole().length() == 0) {
-            updatableAccount.setRole(null);
-        }
-
-        if (updatableAccount.getPicture() != null && account.getPicture().length != 0) {
-            if (!Arrays.equals(updatableAccount.getPicture(), account.getPicture())) {
-                updatableAccount.setPicture(account.getPicture());
-            }
-        } else if (updatableAccount.getPicture() == null) {
-            if (account.getPicture() != null) {
-                updatableAccount.setPicture(account.getPicture());
-            } else {
-                updatableAccount.setPicture(updatableAccount.getPicture());
+        if (transfer.isPicAttached()) {
+            AccountPicture storedPicture = (AccountPicture) pictureRepository.getAccountPicture(storedAccount);
+            if (!Arrays.equals(storedPicture.getContent(), transfer.getPicture())) {
+                storedPicture.setContent(transfer.getPicture());
+                pictureRepository.update(storedPicture);
             }
         }
 
-        accountDao.update(updatableAccount);
+        Account updatedAccount = updateFromTransfer(storedAccount, transfer);
+        logger.info("Account ID {} has been updated.", updatedAccount.getAccountID());
 
-        if (updatableAccount.getPhones() != null && account.getPhones().size() != 0) {
-            List<Phone> dataBasePhones = updatableAccount.getPhones();
-            List<Phone> inputPhones = account.getPhones();
+        return accountRepository.update(updatedAccount);
+    }
 
-            inputPhones.removeIf(inputPhone -> inputPhone.getPhoneNumber().equals(""));
-
-            if (inputPhones.size() == 0) {
-                for (Phone dataBasePhone : dataBasePhones) {
-                    phoneDao.deleteById(dataBasePhone.getPhoneID());
-                }
-                return;
-            }
-
-            if (dataBasePhones.size() == inputPhones.size()) {
-                for (int i = 0; i < dataBasePhones.size(); i++) {
-                    if (inputPhones.get(i).getPhoneType().equals(dataBasePhones.get(i).getPhoneType())) {
-                        if (!inputPhones.get(i).getPhoneNumber().equals(dataBasePhones.get(i).getPhoneNumber())) {
-                            dataBasePhones.get(i).setPhoneNumber(inputPhones.get(i).getPhoneNumber());
-                            phoneDao.update(dataBasePhones.get(i));
-                        }
-                    } else {
-                        phoneDao.create(inputPhones.get(i));
-                    }
-                }
-            } else {
-                if (inputPhones.get(0).getPhoneType().equals(dataBasePhones.get(0).getPhoneType())) {
-                    if (!inputPhones.get(0).getPhoneNumber().equals(dataBasePhones.get(0).getPhoneNumber())) {
-                        dataBasePhones.get(0).setPhoneNumber(inputPhones.get(0).getPhoneNumber());
-                        phoneDao.update(dataBasePhones.get(0));
-                    }
-                    if (dataBasePhones.size() > inputPhones.size()) {
-                        phoneDao.deleteById(dataBasePhones.get(1).getPhoneID());
-                    } else {
-                        phoneDao.create(inputPhones.get(1));
-                    }
-                } else {
-                    if (dataBasePhones.size() > inputPhones.size()) {
-                        if (!inputPhones.get(0).getPhoneNumber().equals(dataBasePhones.get(1).getPhoneNumber())) {
-                            dataBasePhones.get(1).setPhoneNumber(inputPhones.get(0).getPhoneNumber());
-                            phoneDao.update(dataBasePhones.get(1));
-                        }
-                        phoneDao.deleteById(dataBasePhones.get(0).getPhoneID());
-                    } else {
-                        dataBasePhones.get(0).setPhoneType(inputPhones.get(0).getPhoneType());
-                        dataBasePhones.get(0).setPhoneNumber(inputPhones.get(0).getPhoneNumber());
-                        phoneDao.update(dataBasePhones.get(0));
-                        phoneDao.create(inputPhones.get(1));
-                    }
-                }
-            }
-        } else if (updatableAccount.getPhones() == null) {
-            if (account.getPhones().size() != 0) {
-                for (Phone inputPhone : account.getPhones()) {
-                    phoneDao.create(inputPhone);
-                }
-            }
-        } else {
-            for (Phone phone : updatableAccount.getPhones()) {
-                phoneDao.deleteById(phone.getPhoneID());
-            }
+    private Account updateFromTransfer(Account account, AccountTransfer transfer) {
+        account.setSurname(transfer.getSurname());
+        account.setMiddlename(transfer.getMiddlename());
+        account.setName(transfer.getName());
+        account.setEmail(transfer.getEmail());
+        account.setDateOfBirth(transfer.getDateOfBirth());
+        account.setSkype(transfer.getSkype());
+        account.setIcq(transfer.getIcq());
+        account.setHomeAddress(transfer.getHomeAddress());
+        account.setWorkAddress(transfer.getWorkAddress());
+        account.setAddInfo(transfer.getAddInfo());
+        account.setRole(transfer.getRole());
+        account.getPhones().clear();
+        if (transfer.getPhones() != null) {
+            account.getPhones().addAll(populateEntityPhones(account, transfer.getPhones()));
         }
+        if (transfer.isPicAttached()) {
+            account.setPicAttached(transfer.isPicAttached());
+        }
+
+        return account;
     }
 
     @Transactional
     public void delete(Account account) {
-        accountDao.deleteById(account.getAccountID());
+        accountRepository.deleteById(account.getAccountID());
     }
 
-
     public Account getById(long id) {
-        Account account = accountDao.getById(id);
-        if (account != null) {
-            setUpPhones(account);
-        }
+        return accountRepository.getById(id);
+    }
 
-        return account;
+    @Transactional
+    public Account getByIdFetchPhones(long id) {
+        return accountRepository.getByIdFetchPhones(id);
     }
 
     public Account getByEmail(String email) {
-        Account account = accountDao.getByEmail(email);
-        if (account != null) {
-            setUpPhones(account);
-        }
-
-        return account;
-    }
-
-    public List<Account> getAccountsListForGroup(Group group) {
-        List<Account> accounts = accountDao.getAccountsForGroup(group);
-        for (Account account : accounts) {
-            setUpPhones(account);
-        }
-
-        return accounts;
-    }
-
-    public List<Account> getUnconfirmedRequestAccountsForGroup(Group group) {
-        List<Account> accounts = accountDao.getUnconfirmedRequestAccountsForGroup(group);
-        for (Account account : accounts) {
-            setUpPhones(account);
-        }
-
-        return accounts;
+        return accountRepository.getByEmail(email);
     }
 
     @Transactional
-    public void createRelation(long creatorID, long recipientID) {
-        relationDao.createRelation(creatorID, recipientID);
+    public Account getByEmailFetchPhones(String email) {
+        return accountRepository.getByEmailFetchPhones(email);
     }
 
-    @Transactional
-    public void acceptRelation(long creatorID, long recipientID) {
-        relationDao.acceptRelation(creatorID, recipientID);
+    public SecurityAccount getSecurityAccountByEmail(String email) {
+        Account account = accountRepository.getByEmail(email);
+
+        return new SecurityAccount(account.getAccountID(), account.getEmail(), account.getPassword(), account.isEnabled());
     }
 
-    @Transactional
-    public void declineRelation(long creatorID, long recipientID) {
-        relationDao.declineRelation(creatorID, recipientID);
-    }
-
-    @Transactional
-    public void deleteRelation(long creatorID, long recipientID) {
-        relationDao.breakRelation(creatorID, recipientID);
-    }
-
-    public List<Account> getAccountFriends(Account account) {
-        List<Account> accounts = relationDao.getFriendsList(account);
-        for (Account accountEntry : accounts) {
-            setUpPhones(account);
+    public List<Phone> populateEntityPhones(Account account, List<Phone> transferPhones) {
+        for (Phone transferPhone : transferPhones) {
+            transferPhone.setAccount(account);
         }
 
-        return accounts;
+        return transferPhones;
     }
 
-    public List<Account> getPendingRequestAccounts(Account account) {
-        List<Request> pendingRequests = requestDao.getPendingRequestsList(account);
-        List<Account> pendingAccounts = new ArrayList<>();
+    public List<Phone> populateTransferPhones(String[] homePhones, String[] workPhones) {
+        List<Phone> phones = new ArrayList<>();
+        addPhones(homePhones, phones, "home");
+        addPhones(workPhones, phones, "work");
 
-        if (!pendingRequests.isEmpty()) {
-            for (Request request : pendingRequests) {
-                pendingAccounts.add(accountDao.getById(request.getCreatorID()));
+        return phones;
+    }
+
+    private void addPhones(String[] phoneStrings, List<Phone> phones, String type) {
+        if (phoneStrings != null) {
+            for (String phone : phoneStrings) {
+                if (!phone.equals(EMPTY_PHONE_INPUT)) {
+                    phones.add(new Phone(phone, type));
+                }
             }
         }
-        return pendingAccounts;
     }
 
-    public List<Account> getOutgoingRequestAccounts(Account account) {
-        List<Request> outgoingRequests = requestDao.getOutgoingRequestsList(account);
-        List<Account> outgoingAccounts = new ArrayList<>();
+    public List<Account> getAccountsListForGroup(Community community) {
+        return accountRepository.getAccountsForCommunity(community);
+    }
 
-        if (!outgoingRequests.isEmpty()) {
-            for (Request request : outgoingRequests) {
-                outgoingAccounts.add(accountDao.getById(request.getRecipientID()));
-            }
+    public boolean isAccountAvailable(String email) {
+        return accountRepository.isAccountAvailable(email);
+    }
+
+    public Boolean isEmailExist(String email) {
+        List<String> existingEmails = accountRepository.getExistingEmails();
+
+        return existingEmails.contains(email);
+    }
+
+    @Transactional
+    @Secured("ROLE_ADMIN")
+    public Account switchAccount(long id) {
+        Account account = getById(id);
+        account.setEnabled(!account.isEnabled());
+
+        return accountRepository.update(account);
+    }
+
+    @Transactional
+    @Secured("ROLE_ADMIN")
+    public void makeAdmin(long id) {
+        Account account = getById(id);
+
+        if (!account.getRole().equals(ADMIN)) {
+            account.setRole(ADMIN);
+        } else {
+            throw new IllegalStateException("Account already have admin permission.");
         }
-        return outgoingAccounts;
     }
 
-    public List<Account> searchForAccounts(String value, int currentPage) {
-        return accountDao.searchEntities(value, currentPage);
-    }
-
-    public int getNumberOfPages(String value) {
-        int rows = accountDao.getCountOfSearchResults(value);
-        int numOfPages = rows / RECORDS_PER_PAGE;
-
-        if (numOfPages % RECORDS_PER_PAGE > 0) {
-            numOfPages++;
-        }
-
-        return numOfPages;
-    }
-
-    private void setUpPhones(Account account) {
-        account.setPhones(phoneDao.getAllPhonesByAccountId(account.getAccountID()));
+    @Transactional
+    public void updatePassword(String password, Account account) {
+        accountRepository.updatePassword(password, account.getAccountID());
     }
 }

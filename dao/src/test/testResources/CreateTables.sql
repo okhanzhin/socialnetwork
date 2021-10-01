@@ -1,6 +1,6 @@
-CREATE TABLE IF NOT EXISTS Accounts
+CREATE TABLE IF NOT EXISTS accounts
 (
-    account_ID         INT         NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    accountID          INT         NOT NULL PRIMARY KEY AUTO_INCREMENT,
     surname            VARCHAR(45) NOT NULL,
     middlename         VARCHAR(45),
     name               VARCHAR(30) NOT NULL,
@@ -14,55 +14,112 @@ CREATE TABLE IF NOT EXISTS Accounts
     addInfo            VARCHAR(100),
     dateOfRegistration DATE,
     role               VARCHAR(5),
-    picture            MEDIUMBLOB
+    enabled            TINYINT(1)  NOT NULL DEFAULT '1',
+    picAttached        TINYINT(1)  NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Groups
+CREATE TABLE IF NOT EXISTS acc_pictures
 (
-    group_ID           INT         NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    groupName          VARCHAR(45) NOT NULL,
-    groupDescription   VARCHAR(300),
+    picID     INT        NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    accountID INT        NOT NULL,
+    content   MEDIUMBLOB NOT NULL,
+    FOREIGN KEY (accountID) REFERENCES accounts (accountID) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS communities
+(
+    commID             INT         NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    commName           VARCHAR(45) NOT NULL UNIQUE,
+    commDescription    VARCHAR(300),
     dateOfRegistration DATE,
-    picture            MEDIUMBLOB
+    picAttached        TINYINT(1)  NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Relationship
+CREATE TABLE IF NOT EXISTS comm_pictures
 (
-    accountOne_ID    INT        NOT NULL,
-    accountTwo_ID    INT        NOT NULL,
-    status           TINYINT(3) NOT NULL DEFAULT '0',
-    actionAccount_ID INT        NOT NULL,
-    CONSTRAINT relationship_pr PRIMARY KEY (accountOne_ID, accountTwo_ID),
-    FOREIGN KEY (accountOne_ID) REFERENCES Accounts (account_ID) ON DELETE CASCADE,
-    FOREIGN KEY (accountTwo_ID) REFERENCES Accounts (account_ID) ON DELETE CASCADE,
-    FOREIGN KEY (actionAccount_ID) REFERENCES Accounts (account_ID) ON DELETE CASCADE
+    picID   INT        NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    commID  INT        NOT NULL,
+    content MEDIUMBLOB NOT NULL,
+    FOREIGN KEY (commID) REFERENCES communities (commID) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Phones
+CREATE TABLE IF NOT EXISTS chat_rooms
 (
-    phone_ID    INT         NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    account_ID  INT         NOT NULL,
+    chatRoomID        INT        NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    interlocutorOneID INT        NOT NULL,
+    interlocutorTwoID INT        NOT NULL,
+    FOREIGN KEY (interlocutorOneID) REFERENCES accounts (accountID) ON DELETE CASCADE,
+    FOREIGN KEY (interlocutorTwoID) REFERENCES accounts (accountID) ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS relations
+(
+    relationID      INT        NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    accountOneID    INT        NOT NULL,
+    accountTwoID    INT        NOT NULL,
+    relationStatus  TINYINT(3) NOT NULL DEFAULT '0',
+    actionAccountID INT        NOT NULL,
+    FOREIGN KEY (accountOneID) REFERENCES accounts (accountID) ON DELETE CASCADE,
+    FOREIGN KEY (accountTwoID) REFERENCES accounts (accountID) ON DELETE CASCADE,
+    FOREIGN KEY (actionAccountID) REFERENCES accounts (accountID) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS phones
+(
+    phoneID     INT         NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    accountID   INT         NOT NULL,
     phoneNumber VARCHAR(15) NOT NULL,
     phoneType   VARCHAR(15) NOT NULL,
-    FOREIGN KEY (account_ID) REFERENCES Accounts (account_ID) ON DELETE CASCADE
+    FOREIGN KEY (accountID) REFERENCES accounts (accountID) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Members
+CREATE TABLE IF NOT EXISTS members
 (
-    account_ID   INT        NOT NULL,
-    group_ID     INT        NOT NULL,
+    accountID    INT        NOT NULL,
+    commID       INT        NOT NULL,
     memberStatus TINYINT(3) NOT NULL,
-    CONSTRAINT members_pr PRIMARY KEY (account_ID, group_ID),
-    FOREIGN KEY (account_ID) REFERENCES Accounts (account_ID) ON DELETE CASCADE,
-    FOREIGN KEY (group_ID) REFERENCES Groups (group_ID) ON DELETE CASCADE
+    CONSTRAINT members_pr PRIMARY KEY (accountID, commID),
+    FOREIGN KEY (accountID) REFERENCES accounts (accountID) ON DELETE CASCADE,
+    FOREIGN KEY (commID) REFERENCES communities (commID) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Requests
+CREATE TABLE IF NOT EXISTS requests
 (
-    request_ID    INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    creator_ID    INT NOT NULL,
-    recipient_ID  INT NOT NULL,
-    requestType   VARCHAR(5),
-    requestStatus TINYINT(4)
+    requestID     INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    sourceID      INT NOT NULL,
+    accTargetID   INT,
+    commTargetID  INT,
+    requestType   VARCHAR(7),
+    requestStatus TINYINT(4),
+    FOREIGN KEY (sourceID) REFERENCES accounts (accountID) ON DELETE CASCADE,
+    FOREIGN KEY (accTargetID) REFERENCES accounts (accountID) ON DELETE CASCADE,
+    FOREIGN KEY (commTargetID) REFERENCES communities (commID) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS messages
+(
+    messageID       INT  NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    chatRoomID      INT  NOT NULL,
+    sourceID        INT  NOT NULL,
+    targetID        INT  NOT NULL,
+    content         TEXT NOT NULL,
+    publicationDate TIMESTAMP,
+    FOREIGN KEY (chatRoomID) REFERENCES chat_rooms (chatRoomID) ON DELETE CASCADE,
+    FOREIGN KEY (sourceID) REFERENCES accounts (accountID) ON DELETE CASCADE,
+    FOREIGN KEY (targetID) REFERENCES accounts (accountID) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS posts
+(
+    postID          INT       NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    sourceID        INT       NOT NULL,
+    accTargetID     INT,
+    commTargetID    INT,
+    postType        VARCHAR(7),
+    content         TEXT      NOT NULL,
+    publicationDate TIMESTAMP NOT NULL,
+    FOREIGN KEY (sourceID) REFERENCES accounts (accountID) ON DELETE CASCADE,
+    FOREIGN KEY (accTargetID) REFERENCES accounts (accountID) ON DELETE CASCADE,
+    FOREIGN KEY (commTargetID) REFERENCES communities (commID) ON DELETE CASCADE
+);

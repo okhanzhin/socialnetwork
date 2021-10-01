@@ -11,6 +11,14 @@
 
     <artifactId>dao</artifactId>
 
+    <properties>
+        <junit-jupiter.version>5.4.0</junit-jupiter.version>
+        <common-dbcp.version>2.7.0</common-dbcp.version>
+        <spring-data.version>2.3.9.RELEASE</spring-data.version>
+        <mysql-connector.version>8.0.20</mysql-connector.version>
+        <h2.version>1.4.200</h2.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.getjavajob.okhanzhin</groupId>
@@ -27,23 +35,34 @@
         </dependency>
 
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.4.0</version>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>5.2.9.RELEASE</version>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>5.2.0</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
-            <version>2.7.0</version>
+            <version>${common-dbcp.version}</version>
         </dependency>
     </dependencies>
 </project>

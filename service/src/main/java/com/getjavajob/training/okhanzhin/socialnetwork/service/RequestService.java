@@ -1,66 +1,123 @@
 package com.getjavajob.training.okhanzhin.socialnetwork.service;
 
-import com.getjavajob.training.okhanzhin.socialnetwork.dao.RequestDao;
+import com.getjavajob.training.okhanzhin.socialnetwork.dao.interfaces.RequestRepository;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
-import com.getjavajob.training.okhanzhin.socialnetwork.domain.Group;
-import com.getjavajob.training.okhanzhin.socialnetwork.domain.Request;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.Community;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.request.AccountRequest;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.request.CommunityRequest;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.request.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RequestService {
-    private final RequestDao requestDao;
+    public static final Request.Status ACCEPTED = Request.Status.ACCEPTED;
+    public static final Request.Status UNCONFIRMED = Request.Status.UNCONFIRMED;
+
+    private final RequestRepository requestRepository;
 
     @Autowired
-    public RequestService(RequestDao requestDao) {
-        this.requestDao = requestDao;
+    public RequestService(RequestRepository requestRepository) {
+        this.requestRepository = requestRepository;
     }
 
     @Transactional
-    public Request createRequest(Request request) {
-        return requestDao.create(request);
+    public Request createAccountRequest(Account creator, Account recipient) {
+        return requestRepository.create(new AccountRequest(creator, recipient, UNCONFIRMED));
     }
 
     @Transactional
-    public void acceptRequest(Request request) {
-        requestDao.update(request);
+    public Request createCommunityRequest(Account creator, Community recipient) {
+        return requestRepository.create(new CommunityRequest(creator, recipient, UNCONFIRMED));
+    }
+
+    @Transactional
+    public Request acceptAccountRequest(Account creator, Account recipient) {
+        Request request = getAccountRequest(creator, recipient);
+        request.setRequestStatus(ACCEPTED);
+
+        return requestRepository.update(request);
+    }
+
+    @Transactional
+    public Request acceptCommunityRequest(Account creator, Community recipient) {
+        Request request = getCommunityRequest(creator, recipient);
+        request.setRequestStatus(ACCEPTED);
+
+        return requestRepository.update(request);
     }
 
     @Transactional
     public void deleteRequest(Request request) {
-        requestDao.deleteById(request.getRequestID());
+        requestRepository.deleteById(request.getRequestID());
     }
 
     public Request getById(long requestID) {
-        return requestDao.getById(requestID);
+        return requestRepository.getById(requestID);
     }
 
     @Transactional
     public void setRequestUnconfirmed(Request request) {
-        request.setStatus(Request.Status.UNCONFIRMED);
-        requestDao.update(request);
+        request.setRequestStatus(UNCONFIRMED);
+        requestRepository.update(request);
     }
 
-    public Request getByCreatorRecipientID(long creatorID, long recipientID) {
-        return requestDao.getByCreatorRecipientID(creatorID, recipientID);
+    public Request getAccountRequest(Account creator, Account recipient) {
+        return requestRepository.getAccountRequest(creator, recipient);
     }
 
-    public List<Request> getListOfGroupRequests(Group group) {
-        return requestDao.getGroupRequestsList(group);
+    public Request getCommunityRequest(Account creator, Community recipient) {
+        return requestRepository.getCommunityRequest(creator, recipient);
     }
 
-    public List<Request> getPendingRequests(Account account) {
-        return requestDao.getPendingRequestsList(account);
+    public List<Account> getRequestingAccounts(Community community) {
+        List<Request> communityRequestsList = requestRepository.getCommunityRequests(community);
+        List<Account> accounts = new ArrayList<>();
+
+        if (!communityRequestsList.isEmpty()) {
+            for (Request request : communityRequestsList) {
+                accounts.add(request.getSource());
+            }
+        }
+
+        return accounts;
     }
 
-    public List<Request> getOutgoingRequests(Account account) {
-        return requestDao.getOutgoingRequestsList(account);
+    public List<Account> getPendingAccounts(Account account) {
+        List<Request> pendingRequests = requestRepository.getPendingRequests(account);
+        List<Account> accounts = new ArrayList<>();
+
+        if (!pendingRequests.isEmpty()) {
+            for (Request request : pendingRequests) {
+                accounts.add(request.getSource());
+            }
+        }
+
+        return accounts;
     }
 
-    public List<Request> getAcceptedRequests(Account account) {
-        return requestDao.getAcceptedRequestsList(account);
+    public List<Account> getOutgoingAccounts(Account account) {
+        List<Request> outgoingRequests = requestRepository.getOutgoingRequests(account);
+        List<Account> accounts = new ArrayList<>();
+
+        if (!outgoingRequests.isEmpty()) {
+            for (Request request : outgoingRequests) {
+                AccountRequest accountRequest = (AccountRequest) request;
+                accounts.add(accountRequest.getAccountTarget());
+            }
+        }
+
+        return accounts;
+    }
+
+    public List<AccountRequest> getAcceptedRequests(Account account) {
+        List<Request> requests = requestRepository.getAcceptedRequestsList(account);
+
+        return requests.stream().map(e -> (AccountRequest) e).collect(Collectors.toList());
     }
 }

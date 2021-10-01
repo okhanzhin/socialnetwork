@@ -1,188 +1,181 @@
 package com.getjavajob.training.okhanzhin.socialnetwork.service;
 
-import com.getjavajob.training.okhanzhin.socialnetwork.dao.AccountDao;
-import com.getjavajob.training.okhanzhin.socialnetwork.dao.PhoneDao;
-import com.getjavajob.training.okhanzhin.socialnetwork.dao.RelationshipDao;
-import com.getjavajob.training.okhanzhin.socialnetwork.dao.RequestDao;
+import com.getjavajob.training.okhanzhin.socialnetwork.dao.interfaces.AccountRepository;
+import com.getjavajob.training.okhanzhin.socialnetwork.dao.interfaces.PictureRepository;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Account;
-
-import com.getjavajob.training.okhanzhin.socialnetwork.domain.Group;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.Community;
 import com.getjavajob.training.okhanzhin.socialnetwork.domain.Phone;
-import com.getjavajob.training.okhanzhin.socialnetwork.domain.Request;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.dto.AccountTransfer;
+import com.getjavajob.training.okhanzhin.socialnetwork.domain.picture.AccountPicture;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AccountServiceTest {
+    private static final String ROLE_USER = "USER";
+
     @Mock
-    private AccountDao accountDao;
+    private AccountRepository accountRepository;
     @Mock
-    private PhoneDao phoneDao;
-    @Mock
-    private RelationshipDao relationDao;
-    @Mock
-    private RequestDao requestDao;
+    private PictureRepository pictureRepository;
 
     @InjectMocks
     private AccountService accountService;
 
+    private AccountTransfer transfer;
+    private Account account;
+    private Community community;
+
+    @Before
+    public void init() {
+        transfer = new AccountTransfer(1L, "One", "One",
+                "onee221@gmail.com", "onepass", LocalDate.now(), ROLE_USER);
+        account = new Account(1L, "One", "One",
+                "onee221@gmail.com", "onepass", LocalDate.now(), ROLE_USER);
+        community = new Community("First Group");
+    }
+
     @Test
     public void createAccount() {
-        Account account = new Account(1, "One", "One", "onee221@gmail.com", "onepass", LocalDate.now());
-        when(accountDao.create(account)).thenReturn(account);
-        Account actual = accountService.createAccount(account);
+        transfer.setPicture(new byte[0]);
+        AccountPicture accountPicture = new AccountPicture(transfer.getPicture());
+        accountPicture.setAccount(account);
 
-        verify(accountDao, times(1)).create(account);
+        Account actual = accountService.create(transfer);
+
+        verify(pictureRepository, times(1)).create(accountPicture);
         assertEquals(account, actual);
     }
 
     @Test
     public void updateAccount() {
-        Account account = new Account(1, "One", "One", "onee221@gmail.com", "onepass", LocalDate.now());
-        List<Phone> phones = new ArrayList<>();
-        phones.add(new Phone(account.getAccountID(), "home", "89101112233"));
+        transfer.setPicture(new byte[]{1, 2, 3, 4, 5});
+        transfer.setPicAttached(true);
 
-        when(accountDao.getById(1)).thenReturn(account);
-        when(phoneDao.getAllPhonesByAccountId(account.getAccountID())).thenReturn(phones);
-        accountService.updateAccount(account);
-        verify(accountDao).update(account);
+        Account storedAccount = new Account(1L, "Two", "Two",
+                "onee221@gmail.com", "onepass", LocalDate.now(), ROLE_USER);
+        AccountPicture storedPicture = new AccountPicture(new byte[0]);
+        storedPicture.setPicID(1L);
+        storedPicture.setAccount(storedAccount);
+        Account updatedAccount = account;
+
+        when(accountRepository.getByIdFetchPhones(1L)).thenReturn(storedAccount);
+        when(pictureRepository.getAccountPicture(storedAccount)).thenReturn(storedPicture);
+        when(accountRepository.update(updatedAccount)).thenReturn(account);
+
+        assertEquals(account, accountService.update(transfer));
+        verify(accountRepository, times(1)).update(updatedAccount);
+        verify(pictureRepository, times(1)).getAccountPicture(storedAccount);
+        verify(pictureRepository, times(1)).update(storedPicture);
     }
 
     @Test
     public void delete() {
-        Account account = new Account(1, "Two", "Two", "onee221@gmail.com", "twopass", LocalDate.now());
-
         accountService.delete(account);
-        verify(accountDao).deleteById(account.getAccountID());
+        verify(accountRepository).deleteById(account.getAccountID());
     }
 
     @Test
     public void getById() {
-        Account account = new Account(1, "Two", "Two", "onee221@gmail.com", "twopass", LocalDate.now());
+        when(accountRepository.getById(account.getAccountID())).thenReturn(account);
 
-        when(accountDao.getById(account.getAccountID())).thenReturn(account);
-        accountService.getById(account.getAccountID());
-        verify(accountDao).getById(account.getAccountID());
+        assertEquals(account, accountService.getById(account.getAccountID()));
+        verify(accountRepository).getById(account.getAccountID());
+    }
+
+    @Test
+    public void getByIdFetchPhones() {
+        account.setPhones(Collections.singletonList(new Phone("89991112233", "work")));
+
+        when(accountRepository.getByIdFetchPhones(account.getAccountID())).thenReturn(account);
+
+        assertEquals(account, accountService.getByIdFetchPhones(account.getAccountID()));
+        verify(accountRepository).getByIdFetchPhones(account.getAccountID());
     }
 
     @Test
     public void getByEmail() {
-        Account account = new Account(1, "Two", "Two", "onee221@gmail.com", "twopass", LocalDate.now());
+        when(accountRepository.getByEmail(account.getEmail())).thenReturn(account);
 
-        accountService.getByEmail(account.getEmail());
-        verify(accountDao).getByEmail(account.getEmail());
+        assertEquals(account, accountService.getByEmail(account.getEmail()));
+        verify(accountRepository).getByEmail(account.getEmail());
+    }
+
+    @Test
+    public void getByEmailFetchPhones() {
+        account.setPhones(Collections.singletonList(new Phone("89991112233", "work")));
+
+        when(accountRepository.getByEmailFetchPhones(account.getEmail())).thenReturn(account);
+
+        assertEquals(account, accountService.getByEmailFetchPhones(account.getEmail()));
+        verify(accountRepository).getByEmailFetchPhones(account.getEmail());
     }
 
     @Test
     public void getAccountsListForGroup() {
         List<Account> accounts = new ArrayList<>();
-        accounts.add(new Account(1, "One", "One", "onee221@gmail.com", "onepass", LocalDate.now()));
-        accounts.add(new Account(2, "Two", "Two", "twotwotwo@gmail.com", "twopass", LocalDate.now()));
-        Group group = new Group("First Group");
+        accounts.add(new Account(1L, "One", "One",
+                "onee221@gmail.com", "onepass", LocalDate.now(), ROLE_USER));
+        accounts.add(new Account(2L, "Two", "Two",
+                "twotwotwo@gmail.com", "twopass", LocalDate.now(), ROLE_USER));
 
-        when(accountDao.getAccountsForGroup(group)).thenReturn(accounts);
-        accountService.getAccountsListForGroup(group);
-        verify(accountDao).getAccountsForGroup(group);
+        when(accountRepository.getAccountsForCommunity(community)).thenReturn(accounts);
+
+        assertEquals(accounts, accountService.getAccountsListForGroup(community));
+        verify(accountRepository).getAccountsForCommunity(community);
     }
 
     @Test
-    public void getUnconfirmedRequestAccountsForGroup() {
-        List<Account> accounts = new ArrayList<>();
-        accounts.add(new Account(1, "One", "One", "onee221@gmail.com", "onepass", LocalDate.now()));
-        accounts.add(new Account(2, "Two", "Two", "twotwotwo@gmail.com", "twopass", LocalDate.now()));
-        Group group = new Group("First Group");
+    public void isAccountAvailable() {
+        account.setEnabled(true);
 
-        when(accountDao.getUnconfirmedRequestAccountsForGroup(group)).thenReturn(accounts);
-        accountService.getUnconfirmedRequestAccountsForGroup(group);
-        verify(accountDao).getUnconfirmedRequestAccountsForGroup(group);
+        when(accountRepository.isAccountAvailable(account.getEmail())).thenReturn(account.isEnabled());
+
+        assertTrue(accountService.isAccountAvailable(account.getEmail()));
+        verify(accountRepository).isAccountAvailable(account.getEmail());
     }
 
     @Test
-    public void addFriend() {
-        Account account1 = new Account(1, "One", "One", "one221@gmail.com", "onepass", LocalDate.now());
-        Account account2 = new Account(2, "Two", "Two", "two222@gmail.com", "twopass", LocalDate.now());
+    public void isEmailExist() {
+        String currentEmail = "onee221@gmail.com";
 
-        accountService.createRelation(account1.getAccountID(), account2.getAccountID());
-        verify(relationDao, times(1)).createRelation(account1.getAccountID(), account2.getAccountID());
+        when(accountRepository.getExistingEmails()).thenReturn(Collections.singletonList(currentEmail));
+
+        assertTrue(accountService.isEmailExist(currentEmail));
+        verify(accountRepository).getExistingEmails();
     }
 
     @Test
-    public void acceptRelation() {
-        Account account1 = new Account(1, "One", "One", "one221@gmail.com", "onepass", LocalDate.now());
-        Account account2 = new Account(2, "Two", "Two", "two222@gmail.com", "twopass", LocalDate.now());
+    public void switchAccount() {
+        account.setEnabled(true);
 
-        accountService.acceptRelation(account1.getAccountID(), account2.getAccountID());
-        verify(relationDao, times(1)).acceptRelation(account1.getAccountID(), account2.getAccountID());
+        when(accountRepository.getById(account.getAccountID())).thenReturn(account);
+
+        accountService.switchAccount(account.getAccountID());
+        assertFalse(account.isEnabled());
+        verify(accountRepository).update(account);
     }
 
     @Test
-    public void declineRelation() {
-        Account account1 = new Account(1, "One", "One", "one221@gmail.com", "onepass", LocalDate.now());
-        Account account2 = new Account(2, "Two", "Two", "two222@gmail.com", "twopass", LocalDate.now());
-
-        accountService.declineRelation(account1.getAccountID(), account2.getAccountID());
-        verify(relationDao, times(1)).declineRelation(account1.getAccountID(), account2.getAccountID());
-    }
-
-    @Test
-    public void deleteFriend() {
-        Account account1 = new Account(1, "One", "One", "one221@gmail.com", "onepass", LocalDate.now());
-        Account account2 = new Account(2, "Two", "Two", "two222@gmail.com", "twopass", LocalDate.now());
-
-        accountService.deleteRelation(account1.getAccountID(), account2.getAccountID());
-        verify(relationDao, times(1)).breakRelation(account1.getAccountID(), account2.getAccountID());
-    }
-
-    @Test
-    public void getAccountFriends() {
-        Account account1 = new Account(1, "One", "One", "one221@gmail.com", "onepass", LocalDate.now());
-        Account account2 = new Account(2, "Two", "Two", "two222@gmail.com", "twopass", LocalDate.now());
-        Account account3 = new Account(3, "Three", "Three", "three333@gmail.com", "threepass", LocalDate.now());
-        List<Account> exceptedList = Arrays.asList(account2, account3);
-
-        when(relationDao.getFriendsList(account1)).thenReturn(exceptedList);
-        List<Account> actualList = accountService.getAccountFriends(account1);
-        verify(relationDao, times(1)).getFriendsList(account1);
-        assertEquals(exceptedList, actualList);
-    }
-
-    @Test
-    public void getPendingRequestAccounts() {
-        Account account1 = new Account(1, "One", "One", "one221@gmail.com", "onepass", LocalDate.now());
-        Account account2 = new Account(2, "Two", "Two", "two222@gmail.com", "twopass", LocalDate.now());
-        Account account3 = new Account(3, "Three", "Three", "three333@gmail.com", "threepass", LocalDate.now());
-        List<Request> pendingRequests = new ArrayList<>();
-        pendingRequests.add(new Request(account1.getAccountID(), account2.getAccountID(), "user", Request.Status.UNCONFIRMED));
-        pendingRequests.add(new Request(account1.getAccountID(), account3.getAccountID(), "user", Request.Status.UNCONFIRMED));
-
-        when(requestDao.getPendingRequestsList(account1)).thenReturn(pendingRequests);
-        accountService.getPendingRequestAccounts(account1);
-        verify(requestDao, times(1)).getPendingRequestsList(account1);
-    }
-
-    @Test
-    public void getOutgoingRequestAccounts() {
-        Account account1 = new Account(1, "One", "One", "one221@gmail.com", "onepass", LocalDate.now());
-        Account account2 = new Account(2, "Two", "Two", "two222@gmail.com", "twopass", LocalDate.now());
-        Account account3 = new Account(3, "Three", "Three", "three333@gmail.com", "threepass", LocalDate.now());
-        List<Request> outgoingRequests = new ArrayList<>();
-        outgoingRequests.add(new Request(account2.getAccountID(), account1.getAccountID(), "user", Request.Status.UNCONFIRMED));
-        outgoingRequests.add(new Request(account3.getAccountID(), account1.getAccountID(), "user", Request.Status.UNCONFIRMED));
-
-        when(requestDao.getOutgoingRequestsList(account1)).thenReturn(outgoingRequests);
-        accountService.getOutgoingRequestAccounts(account1);
-        verify(requestDao, times(1)).getOutgoingRequestsList(account1);
+    public void updatePassword() {
+        String password = "somePassword";
+        accountService.updatePassword(password, account);
+        verify(accountRepository).updatePassword(password, account.getAccountID());
     }
 }

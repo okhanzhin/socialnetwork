@@ -1,3 +1,8 @@
-/Volumes/Library/dev/projects/getjavajob/social-network/service/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/service/AccountServiceTest.java
-/Volumes/Library/dev/projects/getjavajob/social-network/service/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/service/GroupServiceTest.java
-/Volumes/Library/dev/projects/getjavajob/social-network/service/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/service/RequestServiceTest.java
+/Volumes/Library/dev/projects/docker-compose-network/social-network/service/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/service/PostServiceTest.java
+/Volumes/Library/dev/projects/docker-compose-network/social-network/service/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/service/RelationshipServiceTest.java
+/Volumes/Library/dev/projects/docker-compose-network/social-network/service/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/service/CommunityServiceTest.java
+/Volumes/Library/dev/projects/docker-compose-network/social-network/service/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/service/PictureServiceTest.java
+/Volumes/Library/dev/projects/docker-compose-network/social-network/service/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/service/SearchServiceTest.java
+/Volumes/Library/dev/projects/docker-compose-network/social-network/service/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/service/ChatMessageServiceTest.java
+/Volumes/Library/dev/projects/docker-compose-network/social-network/service/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/service/AccountServiceTest.java
+/Volumes/Library/dev/projects/docker-compose-network/social-network/service/src/test/java/com/getjavajob/training/okhanzhin/socialnetwork/service/RequestServiceTest.java
