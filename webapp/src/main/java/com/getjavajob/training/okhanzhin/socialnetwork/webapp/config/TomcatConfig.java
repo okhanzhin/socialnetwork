@@ -64,6 +64,7 @@ public class TomcatConfig {
             @Override
             protected TomcatWebServer getTomcatWebServer(Tomcat tomcat) {
                 tomcat.enableNaming();
+//                tomcat.setBaseDir("/home/erixon/misc/git/oleg-socialnetwork/webapp/src/main/webapp");
                 return super.getTomcatWebServer(tomcat);
             }
 

@@ -1,5 +1,6 @@
-*.class
+**.class
 *.iml
 .idea/
-target/
-.DS.Store
+**/target/
+**/.DS.Store
+**/target

@@ -54,28 +54,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
 
-        http.formLogin().loginPage("/login").usernameParameter(EMAIL)
-            .successHandler(authenticationSuccessHandler)
-            .failureHandler(authenticationFailureHandler).permitAll()
-            .and()
-            .authorizeRequests()
-            .antMatchers("/admin/**").hasRole("ADMIN")
-            .antMatchers("/account/new", "/account/isEmailExist", "/").anonymous()
-            .antMatchers("/resources/**", "/templates/error", "/").permitAll()
-            .anyRequest().authenticated()
-            .and()
-            .logout().invalidateHttpSession(true).clearAuthentication(true).deleteCookies("JSESSIONID")
-            .logoutSuccessHandler(logoutSuccessHandler)
-            .and()
-            .rememberMe()
-            .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(COOKIE_AGE_IN_DAYS))
-            .key(PASSWORD)
-            .userDetailsService(userDetailsService).authenticationSuccessHandler(authenticationSuccessHandler)
-            .and()
-            .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
-            .and()
-            .addFilterBefore(new AnonymousFilter(), DefaultLoginPageGeneratingFilter.class)
-            .addFilterBefore(accountAvailableValidationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.antMatcher("/**").anonymous();
+//        http.formLogin().loginPage("/login").usernameParameter(EMAIL)
+//            .successHandler(authenticationSuccessHandler)
+//            .failureHandler(authenticationFailureHandler).permitAll()
+//            .and()
+//            .authorizeRequests()
+//            .antMatchers("/admin/**").hasRole("ADMIN")
+//            .antMatchers("/account/new", "/account/isEmailExist", "/").anonymous()
+//            .antMatchers("/resources/**", "/templates/error", "/").permitAll()
+//            .anyRequest().authenticated()
+//            .and()
+//            .logout().invalidateHttpSession(true).clearAuthentication(true).deleteCookies("JSESSIONID")
+//            .logoutSuccessHandler(logoutSuccessHandler)
+//            .and()
+//            .rememberMe()
+//            .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(COOKIE_AGE_IN_DAYS))
+//            .key(PASSWORD)
+//            .userDetailsService(userDetailsService).authenticationSuccessHandler(authenticationSuccessHandler)
+//            .and()
+//            .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
+//            .and()
+//            .addFilterBefore(new AnonymousFilter(), DefaultLoginPageGeneratingFilter.class)
+//            .addFilterBefore(accountAvailableValidationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override

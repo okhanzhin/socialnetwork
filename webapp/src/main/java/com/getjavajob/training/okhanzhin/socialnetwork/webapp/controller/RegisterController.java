@@ -78,7 +78,7 @@ public class RegisterController {
             request.setAttribute(MESSAGE, "Successful registration. Please login.");
             request.setAttribute(EMAIL, storedAccount.getEmail());
 
-            return "login";
+            return "_login";
         }
     }
 
