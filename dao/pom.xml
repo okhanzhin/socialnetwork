@@ -15,7 +15,7 @@
         <junit-jupiter.version>5.4.0</junit-jupiter.version>
         <common-dbcp.version>2.7.0</common-dbcp.version>
         <spring-data.version>2.3.9.RELEASE</spring-data.version>
-        <mysql-connector.version>8.0.20</mysql-connector.version>
+        <mysql-connector.version>8.0.28</mysql-connector.version>
         <h2.version>1.4.200</h2.version>
     </properties>
 
